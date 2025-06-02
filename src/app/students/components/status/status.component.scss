@@ -1,0 +1,371 @@
+@import 'src/styles.scss';
+
+.status-container {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  font-family: 'Noto Sans JP', sans-serif;
+
+  .status-header {
+    margin-bottom: 2rem;
+
+    h1 {
+      font-size: 2rem;
+      color: $color-dark;
+      margin-bottom: 0.5rem;
+    }
+
+    .subtitle {
+      font-size: 1rem;
+      color: $color-text-light;
+      font-style: italic;
+    }
+  }
+
+  .registration-status {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .status-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    padding: 1.5rem;
+    border: 1px solid lighten($color-secondary, 5%);
+
+    .status-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid lighten($color-secondary, 5%);
+
+      .exam-info {
+        h2 {
+          font-size: 1.4rem;
+          color: $color-dark;
+          margin-bottom: 0.3rem;
+        }
+
+        .exam-date, .location {
+          font-size: 0.9rem;
+          color: $color-text-light;
+          margin: 0.2rem 0;
+        }
+      }
+
+      .status-badge {
+        padding: 0.3rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+
+        &.draft {
+          background-color: #fff0c2;
+          color: #a37400;
+          border: 1px solid #ffd54f;
+        }
+
+        &.in-progress {
+          background-color: #e3f2fd;
+          color: #0d47a1;
+          border: 1px solid #64b5f6;
+        }
+
+        &.payment-pending {
+          background-color: #ffebee;
+          color: #c62828;
+          border: 1px solid #ef9a9a;
+        }
+
+        &.completed {
+          background-color: #e8f5e9;
+          color: #2e7d32;
+          border: 1px solid #a5d6a7;
+        }
+      }
+    }
+
+    .progress-section {
+      margin-bottom: 1.5rem;
+
+      .progress-steps {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+
+        .step {
+          display: flex;
+          align-items: center;
+          padding: 0.8rem;
+          border-radius: 8px;
+          background-color: lighten($color-secondary, 10%);
+          position: relative;
+
+          &.completed {
+            background-color: #e8f5e9;
+            border-left: 4px solid #4caf50;
+
+            .step-icon {
+              background-color: #4caf50;
+              color: white;
+            }
+          }
+
+          &.current {
+            background-color: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            box-shadow: 0 2px 8px rgba(33, 150, 243, 0.1);
+
+            .step-icon {
+              background-color: #2196f3;
+              color: white;
+            }
+          }
+
+          .step-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            background-color: white;
+            font-weight: bold;
+          }
+
+          .step-info {
+            flex-grow: 1;
+
+            h4 {
+              font-size: 1rem;
+              color: $color-dark;
+              margin-bottom: 0.2rem;
+            }
+
+            p {
+              font-size: 0.85rem;
+              color: $color-text-light;
+              margin: 0;
+            }
+          }
+
+          .step-action {
+            background: linear-gradient(to right, #3a4a6b, #2c3a58);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+
+            &:hover {
+              background: linear-gradient(to right, #2c3a58, #1e2a3f);
+            }
+          }
+        }
+      }
+    }
+
+    .additional-info {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      padding: 1rem;
+      background-color: lighten($color-secondary, 12%);
+      border-radius: 8px;
+
+      .info-item {
+        .info-label {
+          font-size: 0.85rem;
+          color: $color-text-light;
+          display: block;
+          margin-bottom: 0.2rem;
+        }
+
+        .info-value {
+          font-size: 0.95rem;
+          color: $color-dark;
+          font-weight: 500;
+        }
+
+        .not-assigned {
+          font-size: 0.85rem;
+          color: $color-text-light;
+          font-style: italic;
+        }
+      }
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+
+      button {
+        padding: 0.7rem 1.2rem;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+
+        &.view-form {
+          background-color: white;
+          border: 1px solid $color-dark;
+          color: $color-dark;
+
+          &:hover {
+            background-color: lighten($color-secondary, 5%);
+          }
+        }
+
+        &.download-receipt {
+          background: linear-gradient(to right, #4caf50, #2e7d32);
+          color: white;
+          border: none;
+
+          &:hover {
+            background: linear-gradient(to right, #2e7d32, #1b5e20);
+          }
+        }
+      }
+    }
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 3rem 2rem;
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    border: 1px dashed lighten($color-secondary, 5%);
+
+    .empty-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      opacity: 0.5;
+    }
+
+    h3 {
+      font-size: 1.5rem;
+      color: $color-dark;
+      margin-bottom: 0.5rem;
+    }
+
+    p {
+      color: $color-text-light;
+      margin-bottom: 1.5rem;
+    }
+
+    .register-button {
+      background: linear-gradient(to right, #3a4a6b, #2c3a58);
+      color: white;
+      border: none;
+      padding: 0.8rem 1.5rem;
+      border-radius: 6px;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background: linear-gradient(to right, #2c3a58, #1e2a3f);
+      }
+    }
+  }
+
+  .help-section {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid lighten($color-secondary, 5%);
+
+    h3 {
+      font-size: 1.2rem;
+      color: $color-dark;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+
+    .help-options {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+
+      .help-option {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.8rem 1.2rem;
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        text-decoration: none;
+        color: $color-dark;
+        transition: all 0.2s ease;
+
+        &:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .icon {
+          font-size: 1.2rem;
+        }
+
+        span {
+          font-size: 0.95rem;
+          font-weight: 500;
+        }
+      }
+    }
+  }
+
+  /* Responsive Styles */
+  @media (max-width: 768px) {
+    padding: 1.5rem;
+
+    .status-card {
+      padding: 1.2rem;
+
+      .additional-info {
+        grid-template-columns: 1fr;
+      }
+
+      .action-buttons {
+        flex-direction: column;
+
+        button {
+          width: 100%;
+        }
+      }
+    }
+  }
+
+  @media (max-width: 480px) {
+    padding: 1rem;
+
+    .status-header h1 {
+      font-size: 1.5rem;
+    }
+
+    .progress-steps .step {
+      flex-wrap: wrap;
+
+      .step-action {
+        width: 100%;
+        margin-top: 0.5rem;
+      }
+    }
+  }
+}

@@ -1,1 +1,64 @@
-<p>register works!</p>
+<div class="zen-login-container">
+  <div class="zen-header">
+    <h1>
+      <img class="logo-icon" src="../../../../assets/logo.jpg" style="border-radius: 12px; top: 9px; left: -3px; width: 48px; position: relative;">
+      JLPT Portal
+    </h1>
+    <p>日本語能力試験 登録ポータル</p>
+  </div>
+
+  <div class="zen-bg">
+    <div class="fuji-shadow"></div>
+    <div class="login-card">
+      <h2 *ngIf="!otpSent">📝 Create Account</h2>
+      <h2 *ngIf="otpSent && !otpVerified">🔐 Verify OTP</h2>
+      <h2 *ngIf="otpVerified">✅ Success</h2>
+
+      <!-- Alert Messages -->
+      <div *ngIf="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
+      <div *ngIf="successMessage" class="alert alert-success">{{ successMessage }}</div>
+
+      <!-- Registration Form -->
+      <form *ngIf="!otpSent" (ngSubmit)="register()" #regForm="ngForm">
+        <input type="text" placeholder="👤 Full Name" [(ngModel)]="fullName" name="fullName" required />
+        <input type="email" placeholder="✉️ Email Address" [(ngModel)]="email" name="email" required />
+        <input type="tel" placeholder="📱 Mobile Number" [(ngModel)]="phoneNumber" name="phoneNumber" required />
+        <input type="password" placeholder="🔒 Password" [(ngModel)]="password" name="password" required />
+        <div class="terms">
+          <input type="checkbox" id="terms" [(ngModel)]="acceptTerms" name="terms" />
+          <label for="terms">
+            I agree to the <a href="#">Terms</a> and <a href="#">Privacy Policy</a>
+          </label>
+        </div>
+        <button type="submit" [disabled]="loading || !regForm.valid">
+          {{ loading ? 'Registering...' : 'Register Account' }}
+        </button>
+      </form>
+
+      <!-- OTP Verification Form -->
+      <form *ngIf="otpSent && !otpVerified" (ngSubmit)="verifyOtp()" #otpForm="ngForm">
+        <input type="text" placeholder="Enter OTP" [(ngModel)]="otp" name="otp" required />
+        <button type="submit" [disabled]="loading || otpExpiresIn <= 0">
+          {{ loading ? 'Verifying...' : 'Verify OTP' }}
+        </button>
+
+        <div class="otp-expiry" *ngIf="otpExpiresIn > 0">
+          Expires in {{ otpExpiresIn }}s
+        </div>
+
+        <button type="button" (click)="resendOtp()" [disabled]="otpExpiresIn > 0">
+          Resend OTP
+        </button>
+      </form>
+
+      <!-- Login Redirect -->
+      <div class="login-link" *ngIf="!otpVerified">
+        Already have an account? <a href="/auth/login">Login here</a>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    ©2025 JALTAP Japanese Language Teachers’ Association, Pune
+  </footer>
+</div>

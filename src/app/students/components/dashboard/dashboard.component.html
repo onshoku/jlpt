@@ -1,1 +1,123 @@
-<p>dashboard works!</p>
+<app-header-student></app-header-student>
+
+<div class="dashboard-container">
+    <div class="dashboard-header">
+      <h1>Welcome Back, {{userName}}!</h1>
+      <p class="japanese-greeting">おかえりなさい!</p>
+    </div>
+  
+    <div class="dashboard-grid">
+
+    <!-- Seat Availability Section -->
+    <div class="dashboard-card compact-seat-availability">
+        <h3>Seat Availability</h3>
+        <div class="seat-items">
+          <div class="seat-item" *ngFor="let level of jlptLevels">
+            <span class="level">JLPT {{level.level}}</span>
+            <span class="seats" [class.low]="level.remainingSeats < 20" [class.full]="level.remainingSeats === 0">
+              {{level.remainingSeats === 0 ? 'Full' : level.remainingSeats + ' left'}}
+            </span>
+            <button class="register-btn" 
+                    [disabled]="level.remainingSeats === 0"
+                    routerLink="/registration" 
+                    [queryParams]="{level: level.level}">
+              {{level.remainingSeats === 0 ? 'Waitlist' : 'Register'}}
+            </button>
+          </div>
+        </div>
+        <p class="updated-text">Updated: {{lastUpdated | date:'shortTime'}}</p>
+      </div>
+      <!-- Exam Progress Card -->
+      <div class="dashboard-card progress-card">
+        <div class="card-header">
+          <h2>📊 Your Exam Progress</h2>
+        </div>
+        <div class="progress-container">
+          <div class="progress-item" *ngFor="let exam of currentExams">
+            <div class="progress-info">
+              <span class="exam-level">JLPT {{exam.level}}</span>
+              <span class="exam-date">{{exam.date | date:'mediumDate'}}</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill" [style.width.%]="exam.progress"></div>
+            </div>
+            <span class="progress-percent">{{exam.progress}}% complete</span>
+          </div>
+        </div>
+        <button class="card-button" routerLink="/student/status">View All Status</button>
+      </div>
+  
+      <!-- Quick Actions Card -->
+      <div class="dashboard-card actions-card">
+        <div class="card-header">
+          <h2>⚡ Quick Actions</h2>
+        </div>
+        <div class="actions-grid">
+          <a routerLink="/registration" class="action-item">
+            <div class="action-icon">📝</div>
+            <span>Register for Exam</span>
+          </a>
+          <a routerLink="/history" class="action-item">
+            <div class="action-icon">📚</div>
+            <span>View History</span>
+          </a>
+          <a href="#" class="action-item">
+            <div class="action-icon">📖</div>
+            <span>Study Materials</span>
+          </a>
+          <a routerLink="/profile" class="action-item">
+            <div class="action-icon">👤</div>
+            <span>Update Profile</span>
+          </a>
+        </div>
+      </div>
+  
+      <!-- Upcoming Exams Card -->
+      <div class="dashboard-card exams-card">
+        <div class="card-header">
+          <h2>🗓️ Upcoming Exams</h2>
+        </div>
+        <div class="exams-list">
+          <div class="exam-item" *ngFor="let exam of upcomingExams">
+            <div class="exam-date">
+              <span class="day">{{exam.date | date:'d'}}</span>
+              <span class="month">{{exam.date | date:'MMM'}}</span>
+            </div>
+            <div class="exam-details">
+              <h3>JLPT {{exam.level}}</h3>
+              <p>{{exam.location}}</p>
+            </div>
+            <div class="exam-actions">
+              <button class="small-button">View</button>
+            </div>
+          </div>
+          <div class="no-exams" *ngIf="upcomingExams.length === 0">
+            <p>No upcoming exams scheduled</p>
+            <button routerLink="/registration">Register Now</button>
+          </div>
+        </div>
+      </div>
+  
+      <!-- Study Tips Card -->
+      <div class="dashboard-card tips-card">
+        <div class="card-header">
+          <h2>🌸 JLPT Study Tips</h2>
+        </div>
+        <div class="tips-content">
+          <div class="tip-item">
+            <h3>Vocabulary Building</h3>
+            <p>Try learning 10 new words daily and use them in sentences.</p>
+          </div>
+          <div class="tip-item">
+            <h3>Kanji Practice</h3>
+            <p>Focus on radicals first - they help in remembering complex kanji.</p>
+          </div>
+          <div class="tip-item">
+            <h3>Listening Practice</h3>
+            <p>Watch Japanese shows without subtitles for 15 minutes daily.</p>
+          </div>
+        </div>
+        <button class="card-button">More Tips</button>
+      </div>
+    </div>
+  </div>

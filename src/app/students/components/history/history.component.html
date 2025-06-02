@@ -1,1 +1,94 @@
-<p>history works!</p>
+<app-header-student></app-header-student>
+
+<div class="history-container">
+    <div class="history-header">
+      <h1>Your Exam History</h1>
+      <p class="subtitle">Past JLPT examination records</p>
+    </div>
+  
+    <div class="term-selector">
+      <label for="term-select">Select Examination Term:</label>
+      <select id="term-select" [(ngModel)]="selectedTermId" (change)="onTermChange()">
+        <option *ngFor="let term of examTerms" [value]="term.id">{{term.name}} ({{term.period}})</option>
+      </select>
+    </div>
+  
+    <div class="history-content" *ngIf="selectedTerm">
+      <div class="term-info">
+        <h2>{{selectedTerm.name}} Examination</h2>
+        <p class="exam-period">{{selectedTerm.period}}</p>
+      </div>
+  
+      <div class="registrations-list">
+        <div class="registration-card" *ngFor="let exam of selectedTerm.exams" [ngClass]="getResultClass(exam.result)">
+          <div class="exam-main-info">
+            <div class="exam-level">
+              <span class="level-badge">JLPT {{exam.level}}</span>
+              <span class="exam-date">{{exam.date | date:'mediumDate'}}</span>
+            </div>
+            <div class="exam-status">
+              <span class="status-badge" [ngClass]="getStatusClass(exam.status)">
+                {{exam.status}}
+              </span>
+              <span class="score" *ngIf="exam.score">
+                Score: {{exam.score}}/180
+              </span>
+            </div>
+          </div>
+  
+          <div class="exam-details">
+            <div class="detail-item">
+              <span class="detail-label">Test Center:</span>
+              <span class="detail-value">{{exam.testCenter}}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Registration ID:</span>
+              <span class="detail-value">{{exam.registrationId}}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Seat Number:</span>
+              <span class="detail-value">{{exam.seatNumber || 'N/A'}}</span>
+            </div>
+          </div>
+  
+          <div class="exam-actions">
+            <a *ngIf="exam.resultAvailable" [href]="exam.resultLink" class="action-button result-button">
+              <span class="icon">📊</span>
+              View Result
+            </a>
+            <button class="action-button details-button" (click)="viewDetails(exam)">
+              <span class="icon">📋</span>
+              View Details
+            </button>
+            <button *ngIf="exam.canRetake" class="action-button retake-button" (click)="registerAgain(exam.level)">
+              <span class="icon">🔄</span>
+              Register Again
+            </button>
+          </div>
+  
+          <div class="result-message" *ngIf="exam.resultMessage">
+            <span class="icon" [innerHTML]="getResultIcon(exam.result)"></span>
+            {{exam.resultMessage}}
+          </div>
+        </div>
+  
+        <div class="empty-term" *ngIf="selectedTerm.exams.length === 0">
+          <div class="empty-icon">📭</div>
+          <h3>No Registrations Found</h3>
+          <p>You didn't register for this examination term.</p>
+        </div>
+      </div>
+    </div>
+  
+    <div class="no-history" *ngIf="examTerms.length === 0">
+      <div class="empty-icon">📭</div>
+      <h3>No Past Registrations Found</h3>
+      <p>You haven't appeared for any JLPT examinations yet.</p>
+      <button class="register-button" routerLink="/registration">Register for Exam</button>
+    </div>
+  
+    <div class="history-footer">
+      <p>Need help with your past results or certificates?</p>
+      <a href="#" class="contact-link">Contact JLPT Administration</a>
+    </div>
+  </div>

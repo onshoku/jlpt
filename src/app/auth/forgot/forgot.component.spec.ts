@@ -1,16 +1,16 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { FooterComponent } from './footer.component';
+import { ForgotComponent } from './forgot.component';
 
-describe('FooterComponent', () => {
-  let component: FooterComponent;
-  let fixture: ComponentFixture<FooterComponent>;
+describe('ForgotComponent', () => {
+  let component: ForgotComponent;
+  let fixture: ComponentFixture<ForgotComponent>;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [FooterComponent]
+      declarations: [ForgotComponent]
     });
-    fixture = TestBed.createComponent(FooterComponent);
+    fixture = TestBed.createComponent(ForgotComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

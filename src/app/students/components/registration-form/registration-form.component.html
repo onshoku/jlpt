@@ -1,1 +1,820 @@
-<p>registration-form works!</p>
+<app-header-student></app-header-student>
+
+<div class="registration-container">
+  <div class="registration-header">
+    <h1>JLPT Registration</h1>
+    <p class="subtitle">
+      Japanese Language Proficiency Test - {{ currentTerm }}
+    </p>
+  </div>
+  <div class="registration-progress">
+    <div class="progress-bar">
+      <div class="progress-fill" [style.width.%]="calculateProgress()"></div>
+    </div>
+    <span class="progress-text">{{ calculateProgress() }}% Complete</span>
+  </div>
+  <!-- Breadcrumb Navigation -->
+  <div class="breadcrumb">
+    <ng-container *ngFor="let phase of phases; let i = index">
+      <div
+        class="breadcrumb-item"
+        [ngClass]="{
+          active: currentPhase === phase.id,
+          completed: isPhaseCompleted(phase.id),
+          disabled: !isPhaseAccessible(phase.id)
+        }"
+        (click)="navigateToPhase(phase.id)"
+      >
+        <span class="phase-number">{{ i + 1 }}</span>
+        <span class="phase-name">{{ phase.name }}</span>
+        <span class="checkmark" *ngIf="isPhaseCompleted(phase.id)">✓</span>
+      </div>
+      <div class="breadcrumb-divider" *ngIf="i < phases.length - 1">›</div>
+    </ng-container>
+  </div>
+
+  <!-- Phase Content -->
+  <div class="phase-content">
+    <ng-container [ngSwitch]="currentPhase">
+      <!-- Important Notes Phase -->
+      <div *ngSwitchCase="'important-notes'" class="phase-important-notes">
+        <h2>Important Notes Before Registration</h2>
+        <div class="notes-list">
+          <div class="note-item" *ngFor="let note of importantNotes">
+            <span class="note-icon">⚠️</span>
+            <p>{{ note }}</p>
+          </div>
+        </div>
+        <h2>Steps to Follow</h2>
+        <div class="notes-list">
+          <div class="note-item" *ngFor="let note of stepsToFollow">
+            <span class="note-icon"> ✅ </span>
+            <p>{{ note }}</p>
+          </div>
+        </div>
+        <div class="action-buttons">
+          <button
+            class="next-button"
+            (click)="completePhase('important-notes')"
+          >
+            I Understand - Proceed to Registration
+          </button>
+        </div>
+      </div>
+
+      <!-- Registration Form Phase -->
+      <div class="registration-form" *ngSwitchCase="'registration-form'">
+        <h2>Registration Form</h2>
+        <p class="form-description">
+          Please fill in all required details for JLPT registration
+        </p>
+
+        <form [formGroup]="registrationForm">
+          <button type="button" class="action-buttons" (click)="saveProgress()">Save Progress</button>
+          <!-- Special Arrangements Section -->
+          <div class="form-section">
+            <h3 class="section-title">
+              <span class="english">Special Arrangements</span>
+              <span class="japanese">特別な配慮</span>
+            </h3>
+            <div class="form-field">
+              <label>
+                <input type="checkbox" formControlName="specialArrangement" />
+                Request Special Arrangement
+                <span
+                  class="tooltip-icon"
+                  [matTooltip]="specialArrangementTooltip"
+                  >?</span
+                >
+              </label>
+            </div>
+          </div>
+
+          <!-- Test Level Section -->
+          <div class="form-section">
+            <h3 class="section-title">
+              <span class="english">Test Information</span>
+              <span class="japanese">試験情報</span>
+            </h3>
+
+            <div class="form-field">
+              <label>
+                Test Level
+                <span class="tooltip-icon" [matTooltip]="testLevelTooltip"
+                  >?</span
+                >
+              </label>
+              <select formControlName="testLevel" required>
+                <option *ngFor="let level of jlptLevels" [value]="level.value">
+                  {{ level.label }}
+                </option>
+              </select>
+              <span
+                class="error-message"
+                *ngIf="registrationForm.get('testLevel')?.hasError('required')"
+              >
+                Test level is required
+              </span>
+            </div>
+
+            <div class="form-field">
+              <label>
+                Test Site
+                <span class="tooltip-icon" [matTooltip]="testSiteTooltip"
+                  >?</span
+                >
+              </label>
+              <input type="text" formControlName="testSite" readonly />
+            </div>
+          </div>
+
+          <!-- Personal Details Section -->
+          <div class="form-section">
+            <h3 class="section-title">
+              <span class="english">Personal Details</span>
+              <span class="japanese">個人情報</span>
+            </h3>
+
+            <div class="form-field">
+              <label>
+                Full Name (English characters only)
+                <span class="tooltip-icon" [matTooltip]="nameTooltip">?</span>
+              </label>
+              <div class="name-fields">
+                <input
+                  type="text"
+                  formControlName="firstName"
+                  placeholder="First Name"
+                  maxlength="40"
+                  (input)="validateName($event.target, 'firstName')"
+                />
+                <input
+                  type="text"
+                  formControlName="middleName"
+                  placeholder="Middle Name"
+                  maxlength="40"
+                  (input)="validateName($event.target, 'middleName')"
+                />
+                <input
+                  type="text"
+                  formControlName="lastName"
+                  placeholder="Last Name"
+                  maxlength="40"
+                  (input)="validateName($event.target, 'lastName')"
+                />
+              </div>
+              <span
+                class="error-message"
+                *ngIf="registrationForm.get('firstName')?.hasError('pattern')"
+              >
+                Only English letters (a-z) are allowed
+              </span>
+            </div>
+
+            <div class="form-field">
+              <label>
+                SEQ
+                <span class="tooltip-icon" [matTooltip]="passcodeTooltip"
+                  >?</span
+                >
+              </label>
+              <input type="text" formControlName="regSeq" maxlength="4" />
+            </div>
+
+            <div class="form-field">
+              <label>
+                Gender
+                <span class="tooltip-icon" [matTooltip]="genderTooltip">?</span>
+              </label>
+              <select formControlName="gender" required>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="na">N/A</option>
+              </select>
+            </div>
+
+            <div class="form-field">
+              <label>
+                Native Language
+                <span class="tooltip-icon" [matTooltip]="nativeLanguageTooltip"
+                  >?</span
+                >
+              </label>
+              <mat-form-field appearance="outline">
+                <!-- <mat-label>Select Language</mat-label> -->
+                <input
+                  type="text"
+                  matInput
+                  formControlName="nativeLanguage"
+                  [matAutocomplete]="auto"
+                />
+                <mat-autocomplete #auto="matAutocomplete">
+                  <mat-option
+                    *ngFor="let language of languages"
+                    [value]="language.value"
+                  >
+                    {{ language.label }}
+                  </mat-option>
+                </mat-autocomplete>
+              </mat-form-field>
+            </div>
+
+            <div class="form-field">
+              <label>
+                8-digit Passcode (Numbers only)
+                <span class="tooltip-icon" [matTooltip]="passcodeTooltip"
+                  >?</span
+                >
+              </label>
+              <input
+                type="password"
+                formControlName="passcode"
+                maxlength="8"
+                (input)="validatePasscode($event.target)"
+              />
+              <span
+                class="error-message"
+                *ngIf="registrationForm.get('passcode')?.hasError('pattern')"
+              >
+                Must be 8 digits (0-9)
+              </span>
+            </div>
+
+            <div class="form-field">
+              <label>
+                Date of Birth
+                <span class="tooltip-icon" [matTooltip]="dobTooltip">?</span>
+              </label>
+              <mat-form-field appearance="outline">
+                <input
+                  matInput
+                  [matDatepicker]="picker"
+                  formControlName="dob"
+                  required
+                />
+                <mat-datepicker-toggle
+                  matSuffix
+                  [for]="picker"
+                ></mat-datepicker-toggle>
+                <mat-datepicker #picker></mat-datepicker>
+              </mat-form-field>
+              <span
+                class="error-message"
+                *ngIf="registrationForm.get('dob')?.hasError('required')"
+              >
+                Date of birth is required
+              </span>
+            </div>
+          </div>
+
+          <!-- Address Section -->
+          <div class="form-section">
+            <h3 class="section-title">
+              <span class="english">Address</span>
+              <span class="japanese">住所</span>
+            </h3>
+
+            <div class="form-field">
+              <label>
+                House/Apt/Street
+                <span class="tooltip-icon" [matTooltip]="address1Tooltip"
+                  >?</span
+                >
+              </label>
+              <input type="text" formControlName="address1" required />
+            </div>
+
+            <div class="form-field">
+              <label>
+                City/State
+                <span class="tooltip-icon" [matTooltip]="address2Tooltip"
+                  >?</span
+                >
+              </label>
+              <input type="text" formControlName="address2" required />
+            </div>
+
+            <div class="form-field">
+              <label>
+                Country
+                <span class="tooltip-icon" [matTooltip]="countryTooltip"
+                  >?</span
+                >
+              </label>
+              <input type="text" formControlName="country" required />
+            </div>
+
+            <div class="form-field">
+              <label>
+                Pincode
+                <span class="tooltip-icon" [matTooltip]="pincodeTooltip"
+                  >?</span
+                >
+              </label>
+              <input type="text" formControlName="pincode" required />
+            </div>
+          </div>
+
+          <!-- Mailing Address Section -->
+          <div class="form-section">
+            <h3 class="section-title">
+              <span class="english">Mailing Address</span>
+              <span class="japanese">郵送先住所</span>
+            </h3>
+            <div class="form-field">
+              <label>
+                <input type="checkbox" formControlName="sameAsAddress" />
+                Same as residential address
+                <span class="tooltip-icon" [matTooltip]="mailingAddressTooltip"
+                  >?</span
+                >
+              </label>
+            </div>
+
+            <div *ngIf="!registrationForm.get('sameAsAddress')?.value">
+              <!-- Repeat address fields for mailing address -->
+            </div>
+          </div>
+
+          <!-- Other Details Section -->
+          <div class="form-section">
+            <h3 class="section-title">
+              <span class="english">Other Details</span>
+              <span class="japanese">その他の詳細</span>
+            </h3>
+
+            <!-- Institution Studying Japanese -->
+            <div class="form-field">
+              <label>
+                Institution Studying Japanese
+                <span class="tooltip-icon" [matTooltip]="institutionTooltip"
+                  >?</span
+                >
+              </label>
+              <input type="text" formControlName="institution" />
+            </div>
+
+            <!-- Place of Learning Japanese -->
+            <div class="form-field">
+              <label>
+                Place of Learning Japanese
+                <span class="tooltip-icon" [matTooltip]="learningPlaceTooltip"
+                  >?</span
+                >
+              </label>
+              <select formControlName="learningPlace">
+                <option
+                  *ngFor="let place of learningPlaces"
+                  [value]="place.value"
+                >
+                  {{ place.label }}
+                </option>
+              </select>
+            </div>
+
+            <!-- Reason for Taking Exam -->
+            <div class="form-field">
+              <label>
+                Reason for Taking This Exam
+                <span class="tooltip-icon" [matTooltip]="examReasonTooltip"
+                  >?</span
+                >
+              </label>
+              <select formControlName="examReason">
+                <option
+                  *ngFor="let reason of examReasons"
+                  [value]="reason.value"
+                >
+                  {{ reason.label }}
+                </option>
+              </select>
+            </div>
+
+            <!-- Occupation -->
+            <div class="form-field">
+              <label>
+                Occupation
+                <span class="tooltip-icon" [matTooltip]="occupationTooltip"
+                  >?</span
+                >
+              </label>
+              <select
+                formControlName="occupation"
+                (change)="onOccupationChange()"
+              >
+                <option
+                  *ngFor="let occupation of occupations"
+                  [value]="occupation.value"
+                >
+                  {{ occupation.label }}
+                </option>
+              </select>
+            </div>
+
+            <!-- Occupational Details (conditional) -->
+            <div class="form-field" *ngIf="showOccupationalDetails">
+              <label>
+                Occupational Details
+                <span
+                  class="tooltip-icon"
+                  [matTooltip]="occupationalDetailsTooltip"
+                  >?</span
+                >
+              </label>
+              <select formControlName="occupationalDetails">
+                <option
+                  *ngFor="let detail of occupationalDetails"
+                  [value]="detail.value"
+                >
+                  {{ detail.label }}
+                </option>
+              </select>
+            </div>
+
+            <!-- Japanese Media Contact -->
+            <div class="form-field">
+              <label>
+                Media via which you came into contact with Japanese Language
+                <span class="tooltip-icon" [matTooltip]="mediaContactTooltip"
+                  >?</span
+                >
+              </label>
+              <div class="checkbox-group">
+                <div
+                  *ngFor="let media of mediaContacts"
+                  class="checkbox-option"
+                >
+                  <label>
+                    <input
+                      type="checkbox"
+                      [value]="media.value"
+                      (change)="onMediaContactChange($event, media.value)"
+                    />
+                    {{ media.label }}
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Japanese Communication -->
+            <div class="form-field">
+              <label>
+                The person with whom you usually communicate in Japanese
+                <span class="tooltip-icon" [matTooltip]="communicationTooltip"
+                  >?</span
+                >
+              </label>
+              <div class="communication-grid">
+                <div class="header"></div>
+                <div class="header">Speaking</div>
+                <div class="header">Listening</div>
+                <div class="header">Reading</div>
+                <div class="header">Writing</div>
+
+                <div
+                  *ngFor="let person of communicationPersons"
+                  class="person-row"
+                >
+                  <div class="person-label">{{ person.label }}</div>
+                  <div class="checkbox-cell">
+                    <input
+                      type="checkbox"
+                      (change)="
+                        onCommunicationChange($event, person.id, 'speaking')
+                      "
+                    />
+                  </div>
+                  <div class="checkbox-cell">
+                    <input
+                      type="checkbox"
+                      (change)="
+                        onCommunicationChange($event, person.id, 'listening')
+                      "
+                    />
+                  </div>
+                  <div class="checkbox-cell">
+                    <input
+                      type="checkbox"
+                      (change)="
+                        onCommunicationChange($event, person.id, 'reading')
+                      "
+                    />
+                  </div>
+                  <div class="checkbox-cell">
+                    <input
+                      type="checkbox"
+                      (change)="
+                        onCommunicationChange($event, person.id, 'writing')
+                      "
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Previous JLPT Attempts -->
+            <div class="form-field">
+              <label>
+                Previous JLPT Attempts
+                <span
+                  class="tooltip-icon"
+                  [matTooltip]="previousAttemptsTooltip"
+                  >?</span
+                >
+              </label>
+
+              <div class="attempts-table" formArrayName="attempts">
+                <div class="table-header">
+                  <div>Level</div>
+                  <div>Times Taken</div>
+                  <div>Last Attempt Result</div>
+                </div>
+
+                <div
+                  *ngFor="let group of attemptsArray.controls; let i = index"
+                  [formGroupName]="i"
+                  class="table-row"
+                >
+                  <div>{{ group.value.level }}</div>
+                  <div>
+                    <input type="number" min="0" formControlName="attempts" />
+                  </div>
+                  <div>
+                    <select formControlName="result">
+                      <option value="">N/A</option>
+                      <option value="pass">Pass</option>
+                      <option value="fail">Fail</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Confirmation -->
+          <div class="form-section confirmation">
+            <div class="form-field">
+              <label>
+                <input type="checkbox" formControlName="agreeTerms" required />
+                  I agree to &nbsp;
+                  <a href="link-to-test-guide" target="_blank">the test guide</a>,&nbsp;
+                  <a href="link-to-undertaking" target="_blank">the undertaking </a>, and &nbsp;
+                  <a href="link-to-affidavit" target="_blank"> the affidavit.</a>
+                  <span class="tooltip-icon" [matTooltip]="termsTooltip">?</span>
+              </label>
+              <span
+                class="error-message"
+                *ngIf="registrationForm.get('agreeTerms')?.hasError('required')"
+              >
+                You must agree to the terms
+              </span>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="back-button">Back</button>
+            <!-- <button type="submit" class="submit-button" [disabled]="!registrationForm.valid">
+                  Save & Continue
+                </button> -->
+            <button type="button" class="submit-button" (click)="onSubmit()">
+              Save & Continue
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Upload Documents Phase -->
+      <div *ngSwitchCase="'upload-documents'" class="phase-upload-documents document-upload">
+        <h2>Document Upload</h2>
+        <p class="phase-description">
+          Upload required documents for verification
+        </p>
+        <!-- Document upload content will go here -->
+        <div class="upload-section">
+          <!-- Photo Upload -->
+          <div class="upload-card">
+            <h3>
+              <span class="english">Photograph</span>
+            </h3>
+            <div class="specifications">
+              <h4>Specifications:</h4>
+              <ul>
+                <li>Clear background</li>
+                <li>JPG/JPEG format only</li>
+                <li>Max 50 KB file size</li>
+                <li>Dimensions: 3.5cm × 4.5cm</li>
+                <li>No selfies allowed</li>
+              </ul>
+            </div>
+            <div
+              class="upload-area"
+              (click)="photoInput.click()"
+              [class.has-file]="photoFile"
+            >
+              <input
+                #photoInput
+                type="file"
+                accept=".jpg,.jpeg"
+                (change)="onPhotoSelect($event)"
+                hidden
+              />
+              <div *ngIf="!photoFile" class="upload-instructions">
+                <mat-icon>add_a_photo</mat-icon>
+                <p>Click to upload photograph</p>
+              </div>
+              <div *ngIf="photoFile" class="file-preview">
+                <img
+                  [src]="photoPreview"
+                  alt="Photo preview"
+                  class="preview-image"
+                />
+                <div class="file-info">
+                  <span class="file-name">{{ photoFile.name }}</span>
+                  <span class="file-size"
+                    >{{ photoFile.size / 1024 | number : "1.0-0" }} KB</span
+                  >
+                  <span class="file-remove" (click)="removePhoto($event)"
+                    >×</span
+                  >
+                </div>
+              </div>
+            </div>
+            <div class="validation-message" [class.error]="photoError">
+              {{ photoError || "&nbsp;" }}
+            </div>
+          </div>
+
+          <!-- Signature Upload -->
+          <div class="upload-card">
+            <h3>
+              <span class="english">Signature</span>
+            </h3>
+            <div class="specifications">
+              <h4>Specifications:</h4>
+              <ul>
+                <li>Black ink on white background</li>
+                <li>PNG format preferred</li>
+                <li>Max 30 KB file size</li>
+                <li>Dimensions: 6cm × 3cm</li>
+                <li>Clear and legible</li>
+              </ul>
+            </div>
+            <div
+              class="upload-area"
+              (click)="signatureInput.click()"
+              [class.has-file]="signatureFile"
+            >
+              <input
+                #signatureInput
+                type="file"
+                accept=".png,.jpg,.jpeg"
+                (change)="onSignatureSelect($event)"
+                hidden
+              />
+              <div *ngIf="!signatureFile" class="upload-instructions">
+                <mat-icon>draw</mat-icon>
+                <p>Click to upload signature</p>
+              </div>
+              <div *ngIf="signatureFile" class="file-preview">
+                <img
+                  [src]="signaturePreview"
+                  alt="Signature preview"
+                  class="preview-image"
+                />
+                <div class="file-info">
+                  <span class="file-name">{{ signatureFile.name }}</span>
+                  <span class="file-size"
+                    >{{ signatureFile.size / 1024 | number : "1.0-0" }} KB</span
+                  >
+                  <span class="file-remove" (click)="removeSignature($event)"
+                    >×</span
+                  >
+                </div>
+              </div>
+            </div>
+            <div class="validation-message" [class.error]="signatureError">
+              {{ signatureError || "&nbsp;" }}
+            </div>
+          </div>
+
+          <!-- ID Proof Upload -->
+          <div class="upload-card">
+            <h3>
+              <span class="english">ID Proof</span>
+            </h3>
+            <div class="specifications">
+              <h4>Specifications:</h4>
+              <ul>
+                <li>Government-issued ID only</li>
+                <li>PDF, JPG, or PNG format</li>
+                <li>Max 500 KB file size</li>
+                <li>Clear and readable</li>
+                <li>Should match registration name</li>
+              </ul>
+            </div>
+            <div
+              class="upload-area"
+              (click)="idProofInput.click()"
+              [class.has-file]="idProofFile"
+            >
+              <input
+                #idProofInput
+                type="file"
+                accept=".pdf,.jpg,.jpeg,.png"
+                (change)="onIdProofSelect($event)"
+                hidden
+              />
+              <div *ngIf="!idProofFile" class="upload-instructions">
+                <mat-icon>badge</mat-icon>
+                <p>Click to upload ID proof</p>
+              </div>
+              <div *ngIf="idProofFile" class="file-preview">
+                <mat-icon *ngIf="isPdf(idProofFile)" class="file-icon"
+                  >picture_as_pdf</mat-icon
+                >
+                <img
+                  *ngIf="!isPdf(idProofFile)"
+                  [src]="idProofPreview"
+                  alt="ID proof preview"
+                  class="preview-image"
+                />
+                <div class="file-info">
+                  <span class="file-name">{{ idProofFile.name }}</span>
+                  <span class="file-size"
+                    >{{ idProofFile.size / 1024 | number : "1.0-0" }} KB</span
+                  >
+                  <span class="file-remove" (click)="removeIdProof($event)"
+                    >×</span
+                  >
+                </div>
+              </div>
+            </div>
+            <div class="validation-message" [class.error]="idProofError">
+              {{ idProofError || "&nbsp;" }}
+            </div>
+          </div>
+        </div>
+
+        <div class="action-buttons">
+          <button class="back-button" (click)="previousPhase()">Back</button>
+          <button
+            class="next-button"
+            (click)="completePhase('upload-documents')"
+          >
+            Continue to Payment
+          </button>
+        </div>
+      </div>
+
+      <!-- Undertaking Phase -->
+      <div *ngSwitchCase="'undertaking'" class="phase-undertaking">
+        <h2>Undertaking and Affidavit</h2>
+        <p class="phase-description">Please read and accept the terms</p>
+        <!-- Undertaking content will go here -->
+        <div class="action-buttons">
+          <button class="back-button" (click)="previousPhase()">Back</button>
+          <button class="next-button" (click)="completePhase('undertaking')">
+            Accept & Continue to Payment
+          </button>
+        </div>
+      </div>
+
+      <!-- Payment Phase -->
+      <div *ngSwitchCase="'payment'" class="phase-content phase-payment">
+  <h2>Payment</h2>
+  <p class="phase-description">Complete your registration payment.</p>
+
+  <!-- Payment Instructions (Optional) -->
+  <div class="payment-instructions">
+    <p>Please click the button below to proceed to payment. You will be redirected to Razorpay’s secure checkout.</p>
+  </div>
+
+  <!-- Razorpay Button -->
+  <div class="payment-section">
+    <button class="pay-now-button" (click)="makePayment()">Pay Now</button>
+  </div>
+
+  <div class="action-buttons">
+    <button class="back-button" (click)="previousPhase()">Back</button>
+    <button class="next-button" (click)="completePhase('payment')">Proceed to Review</button>
+  </div>
+</div>
+
+
+      <!-- Review Phase -->
+      <div *ngSwitchCase="'review'" class="phase-review">
+        <h2>Review Your Registration</h2>
+        <p class="phase-description">
+          Verify all information before submission
+        </p>
+        <!-- Review content will go here -->
+        <div class="action-buttons">
+          <button class="back-button" (click)="previousPhase()">Back</button>
+          <button class="submit-button" (click)="submitRegistration()">
+            Submit Registration
+          </button>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+</div>

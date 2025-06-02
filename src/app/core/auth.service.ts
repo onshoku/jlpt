@@ -35,12 +35,14 @@ export class AuthService {
     
     const payload = JSON.parse(atob(token.split('.')[1])); // decode JWT
     return payload.role || null;
+    // return 'student';
   }
 
   // Check if student is logged in
   isStudentLoggedIn(): boolean {
     const role = this.getUserRole();
     return role === 'student';
+    // return true;
   }
 
   // Check if admin is logged in

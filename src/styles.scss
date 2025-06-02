@@ -1,1 +1,88 @@
-/* You can add global styles to this file, and also import other style files */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;700&display=swap');
+
+// 🎨 Soft Japanese Colors
+$color-primary: #FCC9B9;  // Sakura Pink 🌸
+$color-primary-light: #f8e4de;  // Sakura Pink 🌸
+$color-accent: #A8C97F;   // Wasabi Green 🌿
+$color-secondary: #A0D8EF; // Sky Blue ☁️
+$color-dark: #BC002D ;     // Kikyo Purple 💜
+$color-warn: #E95295;     // Tsutsuji Red 🍁
+$color-background: #FEFEFE ; // Soft Light Grey ☁️
+$color-paper: #FFF8E1;    // Warm Light Beige 🏯
+$color-text-dark: #555555; // Dark Grey for readability
+$color-text-light: #5D4037; // Soft brownish tone
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: $color-background;
+  font-family: 'Noto Sans JP', sans-serif;
+  color: $color-text-dark;
+  line-height: 1.6;
+}
+
+// 🎭 Typography Styles
+ h2, h3 {
+  font-weight: 700;
+  color: $color-text-dark;
+  margin-bottom: 10px;
+}
+
+h1{
+  font-weight: 700;
+  color: $color-dark;
+  margin-bottom: 10px;
+}
+
+p {
+  font-size: 1rem;
+  color: $color-text-light;
+}
+
+// hr {
+//   overflow: visible; /* For IE */
+//   height: 30px;
+//   border-style: solid;
+//   border-color: $color-text-light;
+//   border-width: 1px 0 0 0;
+//   border-radius: 20px;
+// }
+// hr:before { /* Not really supposed to work, but does */
+//   display: block;
+//   content: "";
+//   height: 30px;
+//   margin-top: -31px;
+//   border-style: solid;
+//   border-color: $color-text-light;
+//   border-width: 0 0 1px 0;
+//   border-radius: 20px;
+// }
+
+hr {
+  border: none;
+  height: 2px;
+  background: linear-gradient(to right, #BC002D , #E2CFEA, #BC002D );
+  margin: 2rem auto;
+  width: 60%;
+  border-radius: 10px;
+  position: relative;
+}
+
+hr::after {
+  content: '✦';
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 1.2rem;
+  color: #BC002D ;
+  background: #fff;
+  padding: 0 0.5rem;
+}
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }

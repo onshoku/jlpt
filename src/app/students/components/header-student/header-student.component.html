@@ -1,0 +1,78 @@
+<header class="portal-header">
+    <div class="header-container">
+      <!-- Mobile Menu Toggle -->
+      <button class="mobile-menu-toggle" (click)="toggleMobileMenu()">
+        <span class="bar"></span>
+        <span class="bar"></span>
+        <span class="bar"></span>
+      </button>
+  
+      <!-- Logo -->
+      <div class="logo-container">
+        <a routerLink="/dashboard" class="logo-link">
+          <img class="logo-icon" src="../../../../assets/logo.jpg">
+          <span class="logo-text">JLPT Portal</span>
+        </a>
+      </div>
+  
+      <!-- Desktop Navigation -->
+      <nav class="main-nav" [class.mobile-visible]="mobileMenuOpen">
+        <ul class="nav-list">
+          <li class="nav-item">
+            <a routerLink="/student/dashboard" routerLinkActive="active" class="nav-link">
+              <i class="icon icon-dashboard"></i>
+              <span class="nav-text">Dashboard</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a routerLink="/student/registration" routerLinkActive="active" class="nav-link">
+              <i class="icon icon-edit"></i>
+              <span class="nav-text">Registration</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a routerLink="/student/history" routerLinkActive="active" class="nav-link">
+              <i class="icon icon-history"></i>
+              <span class="nav-text">History</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a routerLink="/student/status" routerLinkActive="active" class="nav-link">
+              <i class="icon icon-status"></i>
+              <span class="nav-text">Status</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a routerLink="/student/profile" routerLinkActive="active" class="nav-link">
+              <i class="icon icon-user"></i>
+              <span class="nav-text">Profile</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+  
+      <!-- User Profile -->
+      <div class="user-controls">
+        <div class="user-profile">
+          <span class="user-greeting">こんにちは, {{userName}}</span>
+          <div class="user-avatar" (click)="toggleDropdown()">
+            <span class="avatar-icon">👤</span>
+            <i class="dropdown-arrow" [class.open]="dropdownOpen">▼</i>
+          </div>
+          <div class="dropdown-menu" [class.open]="dropdownOpen" [class.mobile-full]="isMobileView">
+            <a routerLink="/profile" class="dropdown-item">
+              <i class="icon icon-settings"></i> Profile Settings
+            </a>
+            <a href="#" class="dropdown-item" (click)="logout()">
+              <i class="icon icon-logout"></i> Logout
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Mobile Menu Overlay -->
+    <div class="mobile-menu-overlay" 
+         [class.visible]="mobileMenuOpen" 
+         (click)="toggleMobileMenu()"></div>
+  </header>

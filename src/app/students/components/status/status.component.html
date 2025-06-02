@@ -1,1 +1,105 @@
-<p>status works!</p>
+<app-header-student></app-header-student>
+
+<div class="status-container">
+    <div class="status-header">
+      <h1>Your Exam Registrations</h1>
+      <p class="subtitle">Current Term: {{currentTerm}}</p>
+    </div>
+  
+    <div class="registration-status">
+      <div class="status-card" *ngFor="let registration of registrations">
+        <div class="status-header">
+          <div class="exam-info">
+            <h2>JLPT {{registration.level}}</h2>
+            <p class="exam-date">{{registration.examDate | date:'fullDate'}}</p>
+            <p class="location">{{registration.testCenter}}</p>
+          </div>
+          <div class="status-badge" [ngClass]="getStatusClass(registration.status)">
+            {{registration.status}}
+          </div>
+        </div>
+  
+        <div class="progress-section">
+          <div class="progress-steps">
+            <div class="step" *ngFor="let step of registrationSteps" [ngClass]="{'completed': isStepCompleted(registration, step.id), 'current': isCurrentStep(registration, step.id)}">
+              <div class="step-icon">
+                <span *ngIf="isStepCompleted(registration, step.id)">✓</span>
+                <span *ngIf="!isStepCompleted(registration, step.id)">{{step.icon}}</span>
+              </div>
+              <div class="step-info">
+                <h4>{{step.name}}</h4>
+                <p *ngIf="step.id === 'payment' && isStepCompleted(registration, step.id)">
+                  Paid: {{registration.paymentAmount | currency:'JPY':'symbol':'1.0-0'}} on {{registration.paymentDate | date:'shortDate'}}
+                </p>
+                <p *ngIf="step.id === 'documents' && isStepCompleted(registration, step.id)">
+                  Submitted on {{registration.documentSubmissionDate | date:'shortDate'}}
+                </p>
+              </div>
+              <button class="step-action" 
+                      *ngIf="isCurrentStep(registration, step.id)"
+                      (click)="navigateToStep(registration, step.id)">
+                {{step.action}}
+              </button>
+            </div>
+          </div>
+        </div>
+  
+        <div class="additional-info">
+          <div class="info-item">
+            <span class="info-label">Registration ID:</span>
+            <span class="info-value">{{registration.id}}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Last Updated:</span>
+            <span class="info-value">{{registration.lastUpdated | date:'medium'}}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Seat Number:</span>
+            <span class="info-value" *ngIf="registration.seatNumber; else notAssigned">
+              {{registration.seatNumber}}
+            </span>
+            <ng-template #notAssigned>
+              <span class="not-assigned">Will be assigned later</span>
+            </ng-template>
+          </div>
+        </div>
+  
+        <div class="action-buttons">
+          <button class="view-form" (click)="viewFullForm(registration)">
+            View Full Application
+          </button>
+          <button class="download-receipt" (click)="downloadReceipt(registration)">
+            Upgrade Level
+          </button>
+          <button class="download-receipt" *ngIf="registration.status === 'Completed'" (click)="downloadReceipt(registration)">
+            Download Receipt
+          </button>
+        </div>
+      </div>
+  
+      <div class="empty-state" *ngIf="registrations.length === 0">
+        <div class="empty-icon">📭</div>
+        <h3>No Current Registrations</h3>
+        <p>You haven't registered for any exams in the current term.</p>
+        <button class="register-button" routerLink="/registration">Register Now</button>
+      </div>
+    </div>
+  
+    <div class="help-section">
+      <h3>Need Help With Your Registration?</h3>
+      <div class="help-options">
+        <a href="#" class="help-option">
+          <span class="icon">📧</span>
+          <span>Contact Support</span>
+        </a>
+        <a href="#" class="help-option">
+          <span class="icon">❓</span>
+          <span>FAQs</span>
+        </a>
+        <a href="#" class="help-option">
+          <span class="icon">📋</span>
+          <span>Requirements</span>
+        </a>
+      </div>
+    </div>
+  </div>

@@ -1,0 +1,429 @@
+@import 'src/styles.scss';
+
+.dashboard-container {
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  font-family: 'Noto Sans JP', sans-serif;
+
+  .dashboard-header {
+    margin-bottom: 2rem;
+
+    h1 {
+      font-size: 2rem;
+      color: $color-dark;
+      margin-bottom: 0.5rem;
+    }
+
+    .japanese-greeting {
+      font-size: 1.1rem;
+      color: $color-text-light;
+      font-style: italic;
+    }
+  }
+
+  .dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .dashboard-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    padding: 1.5rem;
+    border: 1px solid lighten($color-secondary, 5%);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+    &:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    }
+
+    .card-header {
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid $color-secondary;
+
+      h2 {
+        font-size: 1.3rem;
+        color: $color-dark;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+    }
+  }
+
+  /* Add these styles to your existing dashboard SCSS */
+
+/* Compact Seat Availability Styles */
+.compact-seat-availability {
+    background: white;
+    border-radius: 12px;
+    padding: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    border: 1px solid lighten($color-secondary, 5%);
+  
+    h3 {
+      font-size: 1.1rem;
+      color: $color-dark;
+      margin-bottom: 0.8rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      
+      &::before {
+        content: "⏳";
+        font-size: 1.2rem;
+      }
+    }
+  
+    .seat-items {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+  
+    .seat-item {
+      display: flex;
+      align-items: center;
+      padding: 0.6rem 0.8rem;
+      background-color: lighten($color-secondary, 12%);
+      border-radius: 8px;
+      font-size: 0.95rem;
+  
+      .level {
+        font-weight: 600;
+        color: $color-dark;
+        flex: 1;
+      }
+  
+      .seats {
+        font-weight: 500;
+        margin: 0 1rem;
+        width: 60px;
+        text-align: center;
+  
+        &.low {
+          color: #ff9800;
+          font-weight: 600;
+        }
+  
+        &.full {
+          color: #f44336;
+          font-weight: 600;
+        }
+      }
+  
+      .register-btn {
+        padding: 0.4rem 0.8rem;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        white-space: nowrap;
+  
+        &:not([disabled]) {
+          background-color: $color-dark;
+          color: white;
+  
+          &:hover {
+            background-color: darken($color-dark, 10%);
+          }
+        }
+  
+        &[disabled] {
+          background-color: lighten($color-secondary, 5%);
+          color: $color-text-light;
+          cursor: not-allowed;
+        }
+      }
+    }
+  
+    .updated-text {
+      font-size: 0.75rem;
+      color: $color-text-light;
+      text-align: right;
+      margin-top: 0.5rem;
+    }
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 480px) {
+    .compact-seat-availability {
+      padding: 0.8rem;
+  
+      .seat-item {
+        padding: 0.5rem;
+        font-size: 0.9rem;
+  
+        .register-btn {
+          padding: 0.3rem 0.6rem;
+        }
+      }
+    }
+  }
+  /* Progress Card Styles */
+  .progress-card {
+    .progress-container {
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+
+      .progress-item {
+        .progress-info {
+          display: flex;
+          justify-content: space-between;
+          margin-bottom: 0.5rem;
+
+          .exam-level {
+            font-weight: 600;
+            color: $color-dark;
+          }
+
+          .exam-date {
+            color: $color-text-light;
+            font-size: 0.9rem;
+          }
+        }
+
+        .progress-bar {
+          height: 8px;
+          background-color: lighten($color-secondary, 5%);
+          border-radius: 4px;
+          overflow: hidden;
+
+          .progress-fill {
+            height: 100%;
+            background: linear-gradient(to right, #ff7e9d, #ff6b8b);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+          }
+        }
+
+        .progress-percent {
+          display: block;
+          text-align: right;
+          font-size: 0.85rem;
+          color: $color-text-light;
+          margin-top: 0.3rem;
+        }
+      }
+    }
+
+    .card-button {
+      margin-top: 1.5rem;
+      width: 100%;
+    }
+  }
+
+  /* Actions Card Styles */
+  .actions-card {
+    .actions-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+
+      .action-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 1rem;
+        border-radius: 8px;
+        background-color: lighten($color-secondary, 8%);
+        text-decoration: none;
+        color: $color-text-dark;
+        transition: all 0.2s ease;
+
+        &:hover {
+          background-color: lighten($color-secondary, 3%);
+          transform: translateY(-2px);
+        }
+
+        .action-icon {
+          font-size: 1.8rem;
+          margin-bottom: 0.5rem;
+        }
+
+        span {
+          font-size: 0.95rem;
+          font-weight: 500;
+          text-align: center;
+        }
+      }
+    }
+  }
+
+  /* Exams Card Styles */
+  .exams-card {
+    .exams-list {
+      .exam-item {
+        display: flex;
+        align-items: center;
+        padding: 0.8rem 0;
+        border-bottom: 1px solid lighten($color-secondary, 5%);
+
+        &:last-child {
+          border-bottom: none;
+        }
+
+        .exam-date {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          min-width: 50px;
+          margin-right: 1rem;
+          background-color: lighten($color-secondary, 8%);
+          padding: 0.3rem;
+          border-radius: 6px;
+
+          .day {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: $color-dark;
+          }
+
+          .month {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            color: $color-text-light;
+          }
+        }
+
+        .exam-details {
+          flex-grow: 1;
+
+          h3 {
+            font-size: 1rem;
+            color: $color-dark;
+            margin-bottom: 0.2rem;
+          }
+
+          p {
+            font-size: 0.85rem;
+            color: $color-text-light;
+          }
+        }
+
+        .exam-actions {
+          .small-button {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.85rem;
+          }
+        }
+      }
+
+      .no-exams {
+        text-align: center;
+        padding: 1rem 0;
+
+        p {
+          color: $color-text-light;
+          margin-bottom: 1rem;
+        }
+
+        button {
+          width: 100%;
+        }
+      }
+    }
+  }
+
+  /* Tips Card Styles */
+  .tips-card {
+    .tips-content {
+      .tip-item {
+        margin-bottom: 1.2rem;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+
+        h3 {
+          font-size: 1rem;
+          color: $color-dark;
+          margin-bottom: 0.3rem;
+          display: flex;
+          align-items: center;
+
+          &::before {
+            content: "•";
+            color: #ff7e9d;
+            margin-right: 0.5rem;
+          }
+        }
+
+        p {
+          font-size: 0.9rem;
+          color: $color-text-light;
+          line-height: 1.5;
+          padding-left: 1.2rem;
+        }
+      }
+    }
+
+    .card-button {
+      margin-top: 1rem;
+    }
+  }
+
+  /* Button Styles */
+  .card-button, button {
+    background: linear-gradient(to right, #3a4a6b, #2c3a58);
+    color: white;
+    border: none;
+    padding: 0.7rem 1rem;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: linear-gradient(to right, #2c3a58, #1e2a3f);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+  }
+
+  .small-button {
+    padding: 0.4rem 0.8rem !important;
+    font-size: 0.85rem !important;
+  }
+
+  /* Responsive Styles */
+  @media (max-width: 768px) {
+    padding: 1.5rem;
+
+    .dashboard-header {
+      h1 {
+        font-size: 1.8rem;
+      }
+    }
+
+    .dashboard-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .actions-card .actions-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 480px) {
+    padding: 1rem;
+
+    .dashboard-header {
+      h1 {
+        font-size: 1.5rem;
+      }
+    }
+
+    .dashboard-card {
+      padding: 1.2rem;
+    }
+  }
+}
