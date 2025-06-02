@@ -1,14 +1,14 @@
 @import 'src/styles.scss';
 
 .portal-header {
-    background: linear-gradient(to right, $color-dark, darken($color-dark, 5%));
+    background: solid $color-dark;
   color: white;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
   position: sticky;
   top: 0;
   z-index: 1000;
   padding: 0.5rem 1.5rem;
-  border-bottom: 1px solid lighten($color-dark, 10%);
+  /* border-bottom removed */
 
   .header-container {
     display: flex;
