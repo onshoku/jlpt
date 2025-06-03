@@ -27,7 +27,7 @@
     flex-wrap: wrap;
     margin-bottom: 2rem;
     padding-bottom: 1rem;
-    border-bottom: 1px solid lighten($color-secondary, 5%);
+    border-bottom: 1px solid lighten($color-text-light, 50%); /* Updated border */
 
     .breadcrumb-item {
       display: flex;
@@ -37,12 +37,12 @@
       cursor: pointer;
       transition: all 0.2s ease;
       position: relative;
-      background-color: lighten($color-secondary, 10%);
-      color: $color-text-light;
+      background-color: $color-paper; /* Updated background */
+      color: $color-text-dark; /* Updated color */
 
       .phase-number {
-        background-color: white;
-        color: $color-dark;
+        background-color: $color-text-light; /* Updated phase number background */
+        color: white; /* Updated phase number color */
         width: 20px;
         height: 20px;
         border-radius: 50%;
@@ -56,7 +56,7 @@
 
       .checkmark {
         margin-left: 0.5rem;
-        color: #4caf50;
+        color: $color-accent; /* Ensured theme color */
         font-weight: bold;
       }
 
@@ -65,18 +65,18 @@
         color: white;
 
         .phase-number {
-          background-color: white;
-          color: $color-dark;
+          background-color: white; /* Active state phase number - current is good */
+          color: $color-dark; /* Active state phase number - current is good */
         }
       }
 
       &.completed {
-        background-color: rgba(76, 175, 80, 0.1);
-        color: $color-dark;
+        background-color: lighten($color-accent, 25%); /* Updated completed background */
+        color: $color-accent; /* Updated completed color */
 
         .phase-number {
-          background-color: #4caf50;
-          color: white;
+          background-color: $color-accent; /* Updated completed phase number background */
+          color: white; /* Updated completed phase number color */
         }
       }
 
@@ -95,10 +95,10 @@
   .phase-content {
     background: white;
     border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06); /* Updated box-shadow */
     padding: 2rem;
     margin-bottom: 2rem;
-    border: 1px solid lighten($color-secondary, 5%);
+    /* border removed */
 
     h2 {
       font-size: 1.5rem;
@@ -126,7 +126,7 @@
 
         &.back-button {
           background-color: white;
-          border: 1px solid $color-secondary;
+          border: 1px solid lighten($color-text-light, 50%); /* Updated border */
           color: $color-dark;
 
           &:hover {
@@ -134,21 +134,23 @@
           }
         }
 
-        &.next-button, &.submit-button {
-          background: linear-gradient(to right, #3a4a6b, #2c3a58);
+        &.next-button, &.submit-button:not(.final-submit) { /* Assuming a class like .final-submit for the green one, or adjust selector */
+          background: solid $color-dark; /* Updated background */
           color: white;
           border: none;
 
           &:hover {
-            background: linear-gradient(to right, #2c3a58, #1e2a3f);
+            background: solid darken($color-dark, 8%); /* Updated hover */
           }
         }
 
-        &.submit-button {
-          background: linear-gradient(to right, #4caf50, #2e7d32);
+        &.submit-button.final-submit { /* Specific selector for the final green button */
+          background: solid $color-accent; /* Updated background for final submit */
+          color: white; /* Ensure color is white for accent button */
+          border: none;
 
           &:hover {
-            background: linear-gradient(to right, #2e7d32, #1b5e20);
+            background: solid darken($color-accent, 8%); /* Updated hover for final submit */
           }
         }
       }
@@ -190,7 +192,7 @@
 
       .progress-fill {
         height: 100%;
-        background: linear-gradient(to right, #3a4a6b, #2c3a58);
+        background: solid $color-dark; /* Updated background */
         border-radius: 4px;
         transition: width 0.5s ease;
       }
@@ -225,7 +227,7 @@
     .form-section {
       margin-bottom: 2rem;
       padding-bottom: 1.5rem;
-      border-bottom: 1px solid lighten($color-secondary, 10%);
+      border-bottom: 1px solid lighten($color-text-light, 50%); /* Updated border */
   
       &:last-child {
         border-bottom: none;
@@ -262,8 +264,8 @@
       select {
         width: 100%;
         padding: 0.8rem;
-        border: 1px solid $color-secondary;
-        border-radius: 6px;
+        border: 1px solid lighten($color-text-light, 50%); /* Updated default border */
+        border-radius: 6px; /* Ensured */
         font-size: 1rem;
         transition: border-color 0.2s ease;
   
@@ -317,7 +319,7 @@
           font-weight: 600;
           padding: 0.5rem;
           text-align: center;
-          background-color: lighten($color-secondary, 8%);
+          background-color: $color-paper; /* Updated background */
         }
   
         .person-row {
@@ -334,7 +336,8 @@
             align-items: center;
             justify-content: center;
             padding: 0.5rem;
-            background-color: lighten($color-secondary, 12%);
+            background-color: $color-background; /* Updated background, assuming $color-paper might be too dark or too similar to header */
+            /* Ensure borders are light grey - this might need explicit border rules if not already covered by a general table styling */
           }
         }
       }
@@ -342,14 +345,14 @@
       .attempts-table {
         width: 100%;
         margin-top: 1rem;
-        border: 1px solid $color-secondary;
+        border: 1px solid lighten($color-text-light, 50%); /* Updated border */
         border-radius: 6px;
         overflow: hidden;
       
         .table-header, .table-row {
           display: flex;
           padding: 0.6rem 0;
-          border-bottom: 1px solid lighten($color-secondary, 25%);
+          border-bottom: 1px solid lighten($color-text-light, 60%); /* Updated row border */
       
           > div {
             flex: 1;
@@ -373,7 +376,7 @@
       
         .table-header {
           font-weight: 600;
-          background-color: lighten($color-secondary, 10%);
+          background-color: $color-paper; /* Updated header background */
         }
       
         .table-row:last-child {
@@ -402,8 +405,8 @@
       justify-content: center;
       width: 18px;
       height: 18px;
-      background-color: $color-secondary;
-      color: white;
+      background-color: $color-text-light; /* Updated background */
+      color: white; /* Ensured color */
       border-radius: 50%;
       font-size: 0.7rem;
       margin-left: 0.3rem;
@@ -451,7 +454,7 @@
     }
   
     .confirmation {
-      background-color: lighten($color-secondary, 12%);
+      background-color: $color-paper; /* Updated background */
       padding: 1.5rem;
       border-radius: 8px;
       margin-top: 2rem;
@@ -547,9 +550,9 @@
 
 .phase-payment {
   .payment-instructions {
-    background-color: lighten($color-secondary, 12%);
+    background-color: $color-paper; /* Updated background */
     padding: 1rem;
-    border-left: 4px solid $color-secondary;
+    border-left: 4px solid $color-accent; /* Updated border color */
     border-radius: 6px;
     margin-bottom: 1.5rem;
     color: $color-dark;
@@ -562,18 +565,18 @@
     margin-bottom: 2rem;
 
     .pay-now-button {
-      background: linear-gradient(to right, #4caf50, #2e7d32);
+      background: solid $color-accent; /* Updated background */
       color: white;
       padding: 0.9rem 2rem;
       border: none;
-      border-radius: 8px;
+      border-radius: 8px; /* Ensured border-radius */
       font-size: 1.1rem;
       font-weight: 600;
       cursor: pointer;
       transition: background 0.3s ease;
 
       &:hover {
-        background: linear-gradient(to right, #2e7d32, #1b5e20);
+        background: solid darken($color-accent, 8%); /* Updated hover */
       }
     }
   }
@@ -591,7 +594,7 @@
   }
 
   .upload-card {
-    border: 1px solid lighten($color-secondary, 5%);
+    border: 1px solid lighten($color-text-light, 50%); /* Updated border */
     border-radius: 8px;
     padding: 1.5rem;
     transition: all 0.2s ease;
@@ -615,7 +618,7 @@
     }
 
     .specifications {
-      background-color: lighten($color-secondary, 12%);
+      background-color: $color-paper; /* Updated background */
       padding: 1rem;
       border-radius: 6px;
       margin-bottom: 1rem;
@@ -639,7 +642,7 @@
     }
 
     .upload-area {
-      border: 2px dashed $color-secondary;
+      border: 2px dashed lighten($color-text-light, 30%); /* Updated border */
       border-radius: 6px;
       padding: 1.5rem;
       text-align: center;
@@ -651,7 +654,7 @@
       justify-content: center;
 
       &.has-file {
-        border-color: #4caf50;
+        border-color: $color-accent; /* Updated border color */
         padding: 0.5rem;
       }
 
@@ -713,7 +716,7 @@
           }
 
           .file-remove {
-            color: #f44336;
+            color: $color-warn; /* Updated color */
             font-size: 1.2rem;
             cursor: pointer;
             margin-left: 0.5rem;

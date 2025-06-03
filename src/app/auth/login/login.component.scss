@@ -1,6 +1,5 @@
 @import 'src/styles.scss';
-
-@import 'src/styles.scss';
+/* Duplicate import removed */
 
 .zen-login-container {
   font-family: 'Noto Sans JP', sans-serif;
@@ -23,6 +22,16 @@
     color: $color-dark;
   }
 
+  .logo-icon {
+    border-radius: 12px;
+    width: 48px;
+    /* The following positioning styles are moved from inline HTML. */
+    /* They might need adjustment for perfect alignment. */
+    top: 9px;
+    left: -3px;
+    position: relative;
+  }
+
   p {
     font-size: 1rem;
     color: $color-text-light;
@@ -34,20 +43,20 @@
   position: relative;
   width: 100%;
   max-width: 480px;
-  background: $color-paper;
+  background: rgba(255, 255, 255, 0.85); /* Translucent white */
   padding: 2.5rem 2rem;
-  border-radius: 18px;
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
-  border: 1px solid lighten($color-primary, 15%);
+  border-radius: 12px; /* Adjusted border-radius */
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06); /* Adjusted box-shadow */
+  /* border removed */
   z-index: 2;
 }
 
 .fuji-shadow {
   background: url('https://media.istockphoto.com/id/827638952/photo/pink-sakura-branches-and-fuji-mountain-background-at-kawaguchiko-lake.jpg?s=612x612&w=0&k=20&c=I7-mHcY2yX1KycQ1uz9Iu3ARX0TmaYArv8Ihk41SGrY=') no-repeat center center;
   background-size: cover;
-  opacity: 0.08;
+  opacity: 0.15; /* Increased opacity */
   z-index: 0;
-  border-radius: 18px;
+  border-radius: 12px; /* Match .zen-bg */
   position: absolute;
   inset: 0;
 }
@@ -72,7 +81,7 @@
       padding: 0.9rem;
       font-size: 1rem;
       border: 1px solid $color-secondary;
-      border-radius: 10px;
+      border-radius: 8px; /* Adjusted border-radius */
       outline: none;
 
       &:focus {
@@ -119,7 +128,7 @@
       padding: 0.9rem;
       font-size: 1rem;
       border: none;
-      border-radius: 10px;
+      border-radius: 8px; /* Adjusted border-radius */
       cursor: pointer;
       transition: background 0.3s ease-in-out;
 
@@ -187,11 +196,13 @@ footer {
 }
 
 .alert-danger {
-  background-color: #f8d7da;
-  color: #721c24;
+  background-color: lighten($color-warn, 20%);
+  color: darken($color-warn, 15%);
+  border: 1px solid lighten($color-warn, 10%);
 }
 
 .alert-success {
-  background-color: #d4edda;
-  color: #155724;
+  background-color: lighten($color-accent, 20%);
+  color: darken($color-accent, 15%);
+  border: 1px solid lighten($color-accent, 10%);
 }
