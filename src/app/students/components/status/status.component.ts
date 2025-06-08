@@ -202,6 +202,7 @@ export class StatusComponent {
 
   viewFullForm(registration: any): void {
     console.log(`Viewing full form for ${registration.id}`);
+    this.startNewRegistartion.emit({value:true,id:registration.id});
     // Navigate to view mode of the form
   }
 
