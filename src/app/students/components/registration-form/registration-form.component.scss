@@ -15,6 +15,20 @@
       margin-bottom: 0.5rem;
     }
 
+    .breadcrumb-divider {
+      margin: 0 0.5rem;
+      color: $color-text-light;
+      font-size: 1.5rem;
+      margin-left: -2rem;
+      margin-right: 1rem;
+      margin-top: 0.5rem;
+      cursor:pointer;
+    }
+
+    .main-header{
+      display: flex;
+    }
+
     .subtitle {
       font-size: 1rem;
       color: $color-text-light;
@@ -111,10 +125,17 @@
       margin-bottom: 2rem;
     }
 
+    .errorClass{
+      text-align: end;
+      color: red;
+      font-size: 0.8rem;
+      margin-top: 1rem;
+    }
+
     .action-buttons {
       display: flex;
       justify-content: space-between;
-      margin-top: 2rem;
+      margin-top: 1rem;
 
       button {
         padding: 0.8rem 1.5rem;
@@ -556,6 +577,16 @@
     font-size: 0.95rem;
   }
 
+  .payment-instructions-done {
+  background-color: lighten(#28a745, 20%); // light green background
+  padding: 1rem;
+  border-left: 4px solid #28a745; // success green border
+  border-radius: 6px;
+  margin-bottom: 1.5rem;
+  color: #1c3b23; // dark green text for contrast
+  font-size: 0.95rem;
+}
+
   .payment-section {
     display: flex;
     justify-content: center;
@@ -750,3 +781,332 @@
     }
 }
 
+// Review Phase
+.review-section {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 2rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+
+  h2 {
+    font-size: 1.8rem;
+    color: $color-dark;
+    margin-bottom: 0.5rem;
+  }
+
+  .review-description {
+    color: $color-text-light;
+    margin-bottom: 2rem;
+  }
+
+  .review-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+
+    @media (min-width: 900px) {
+      flex-direction: column;
+    }
+  }
+
+  .document-previews {
+    flex: 0 0 300px;
+    margin-bottom: 2rem;
+
+    @media (min-width: 900px) {
+      // position: sticky;
+      // top: 20px;
+      // align-self: flex-start;
+    }
+
+    .preview-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+
+    .preview-item {
+      h4 {
+        margin-bottom: 0.5rem;
+        color: $color-dark;
+        font-size: 1rem;
+      }
+
+      .preview-container {
+        border: 1px solid $color-secondary;
+        border-radius: 6px;
+        padding: 1rem;
+        background-color: #f9f9f9;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 150px;
+      }
+
+      .preview-image {
+        max-width: 100%;
+        max-height: 140px;
+        object-fit: contain;
+      }
+
+      .no-preview {
+        color: $color-text-light;
+        font-style: italic;
+      }
+    }
+  }
+
+  .form-review {
+    flex: 1;
+  }
+
+  .review-section {
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid lighten($color-secondary, 10%);
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    .section-title {
+      font-size: 1.3rem;
+      color: $color-dark;
+      margin-bottom: 1.5rem;
+      display: flex;
+      flex-direction: column;
+
+      .japanese {
+        font-size: 0.9rem;
+        color: $color-text-light;
+        margin-top: 0.2rem;
+      }
+    }
+  }
+
+  .review-field {
+    margin-bottom: 1rem;
+    display: flex;
+    flex-wrap: wrap;
+
+    .field-label {
+      font-weight: 500;
+      color: #5d4037;
+      margin-right: 0.5rem;
+      flex: 0 0 200px;
+
+      @media (max-width: 600px) {
+        flex: 0 0 100%;
+        margin-bottom: 0.3rem;
+      }
+    }
+
+    .field-value {
+      flex: 1;
+      color: $color-dark;
+      word-break: break-word;
+    }
+  }
+
+  .communication-review, .attempts-review {
+    margin-top: 1rem;
+    overflow-x: auto;
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      border: 1px solid $color-secondary;
+      border-radius: 6px;
+      overflow: hidden;
+
+      th, td {
+        padding: 0.8rem 1rem;
+        text-align: left;
+        border-bottom: 1px solid lighten($color-secondary, 25%);
+      }
+
+      th {
+        background-color: lighten($color-secondary, 10%);
+        font-weight: 600;
+      }
+
+      tr:last-child td {
+        border-bottom: none;
+      }
+
+      td {
+        background-color: white;
+      }
+    }
+  }
+
+  .confirmation {
+    background-color: lighten($color-secondary, 12%);
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-top: 2rem;
+  }
+
+  .review-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 2rem;
+
+    button {
+      padding: 0.8rem 1.5rem;
+      border-radius: 6px;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      &.back-button {
+        background-color: white;
+        border: 1px solid $color-secondary;
+        color: $color-dark;
+
+        &:hover {
+          background-color: #f5f5f5;
+        }
+      }
+
+      &.submit-button {
+        background: linear-gradient(to right, #3a4a6b, #2c3a58);
+        color: white;
+        border: none;
+
+        &:hover:not([disabled]) {
+          background: linear-gradient(to right, #2c3a58, #1e2a3f);
+        }
+
+        &[disabled] {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+      }
+    }
+  }
+}
+
+//undertaking
+/* Legal Documents Styling */
+.legal-documents-container {
+  font-family: 'Roboto', Arial, sans-serif;
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 1.5rem;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.document-section {
+  margin-bottom: 2.5rem;
+  padding: 1.5rem;
+  background-color: white;
+  border-radius: 6px;
+  border-left: 4px solid #3f51b5;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.document-section.undertaking {
+  border-left-color: #4caf50;
+}
+
+.document-section.affidavit {
+  border-left-color: #ff9800;
+}
+
+.document-title {
+  color: #2c3e50;
+  font-size: 1.5rem;
+  margin-bottom: 1.2rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #eee;
+}
+
+.document-text {
+  line-height: 1.6;
+  color: #333;
+  margin-bottom: 1.5rem;
+}
+
+.affidavit-points {
+  padding-left: 1.5rem;
+  margin: 1.5rem 0;
+}
+
+.affidavit-points li {
+  margin-bottom: 0.8rem;
+  line-height: 1.5;
+}
+
+.fill-field {
+  display: inline-block;
+  min-width: 200px;
+  border-bottom: 1px dashed #666;
+  margin: 0 5px;
+  position: relative;
+  top: -2px;
+}
+
+.fill-field.dob {
+  min-width: 100px;
+}
+
+.fill-field.date, 
+.fill-field.place {
+  min-width: 150px;
+}
+
+.fill-field.institute {
+  min-width: 250px;
+}
+
+.fill-field.level {
+  min-width: 30px;
+  text-align: center;
+}
+
+.signature-fields {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 3rem;
+}
+
+.signature-field {
+  width: 45%;
+}
+
+.declaration-check {
+  margin-top: 2rem;
+  padding: 1rem;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .legal-documents-container {
+    padding: 1rem;
+  }
+  
+  .document-section {
+    padding: 1rem;
+  }
+  
+  .signature-fields {
+    flex-direction: column;
+  }
+  
+  .signature-field {
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+  
+  .fill-field {
+    min-width: 120px;
+  }
+}

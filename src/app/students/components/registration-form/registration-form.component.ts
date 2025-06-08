@@ -7,8 +7,10 @@ import {
   FormGroup,
   Validators,
 } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import { map, Observable, startWith } from 'rxjs';
 import { BackendService } from 'src/app/core/api.service';
+import { S3UploadService } from 'src/app/core/upload.service';
 
 declare var Razorpay: any;
 
@@ -21,12 +23,13 @@ export class RegistrationFormComponent {
   currentTerm = 'December 2023 Examination';
   currentPhase = 'important-notes';
   completedPhases: string[] = [];
+  newRegistration = false;
 
   phases = [
     { id: 'important-notes', name: 'Important Notes' },
     { id: 'registration-form', name: 'Registration Form' },
     { id: 'upload-documents', name: 'Documents' },
-    // { id: 'undertaking', name: 'Undertaking' },
+    { id: 'undertaking', name: 'Undertaking' },
     { id: 'payment', name: 'Payment' },
     { id: 'review', name: 'Review' },
   ];
@@ -54,6 +57,15 @@ export class RegistrationFormComponent {
   registrationFormId: string = '';
   filteredLanguages: Observable<any> | null = null;
   showOccupationalDetails = false;
+  registrationFormData: any = {};
+
+  paymentAmt = 500;
+
+  confirmed = false;
+  agreeTermsUndertaking = false;
+  paymentDone = false;
+  paymentDetails = {};
+  underTakingDetails: any = {};
 
   // Tooltips (would be moved to a separate file in production)
   specialArrangementTooltip =
@@ -308,8 +320,31 @@ export class RegistrationFormComponent {
     { value: '000', label: 'Others' },
   ];
 
-  constructor(private fb: FormBuilder, private backendService: BackendService) {
+  hasQueryParams = false;
+  invalidUpload = false;
+  constructor(
+    private fb: FormBuilder,
+    private backendService: BackendService,
+    private route: ActivatedRoute,
+    private s3UploadService: S3UploadService
+  ) {
     this.registrationForm = this.createForm();
+
+    this.route.queryParams.subscribe((params) => {
+      console.log('Query Params:', params);
+
+      // Example: Access specific parameter
+      const level = params['level'];
+      if (level) {
+        this.hasQueryParams = true;
+        let testLevel = level.slice(1, 2);
+        this.newRegistration = true;
+        this.patchFormValues({ testLevel: testLevel });
+        console.log('Exam ID from query:', testLevel);
+      } else {
+        this.hasQueryParams = false;
+      }
+    });
   }
 
   photoFile: File | null = null;
@@ -342,6 +377,14 @@ export class RegistrationFormComponent {
   readonly ID_PROOF_SPECS = {
     maxSize: 500 * 1024, // 500KB
     allowedTypes: ['image/png', 'image/jpeg', 'image/jpg', 'application/pdf'],
+  };
+
+  levelWisePayment: any = {
+    1: 1770,
+    2: 1770,
+    3: 1416,
+    4: 1298,
+    5: 1180,
   };
 
   onPhotoSelect(event: any): void {
@@ -467,6 +510,114 @@ export class RegistrationFormComponent {
     );
   }
 
+  acceptUndertakingForm() {
+    if (this.agreeTermsUndertaking) {
+      let changedValues: any = {};
+      changedValues['userId'] = localStorage.getItem('userId') || '';
+      changedValues['progress'] = 60;
+      changedValues['testLevel'] = this.registrationFormData['testLevel'];
+      changedValues['underTakingAcceptDate'] = new Date().toISOString();
+      changedValues['acceptUnderTakingAndAffidavit'] = true;
+
+      if (this.registrationFormId != '') {
+        changedValues['id'] = this.registrationFormId;
+      }
+
+      this.backendService.save(changedValues).subscribe(
+        (result) => {
+          this.registrationFormId = result.data.id;
+          console.log('result', result);
+
+          this.completePhase('payment');
+        },
+        (error: any) => {
+          //console.log('!! error from updateAPI', error);
+        }
+      );
+    }
+  }
+
+  async uploadPictures(): Promise<void> {
+    if (!this.allDocumentsValid()) {
+      this.invalidUpload = true;
+      return;
+    }
+
+    try {
+      this.invalidUpload = false;
+      let userId = localStorage.getItem('userId') || '';
+      let regId = this.registrationFormId;
+      // Upload photo
+      const photoUrl = await this.s3UploadService.uploadToS3UsingPresignedUrl(
+        this.photoFile!,
+        userId,
+        regId,
+        'photo'
+      );
+
+      // Upload signature
+      const signatureUrl =
+        await this.s3UploadService.uploadToS3UsingPresignedUrl(
+          this.signatureFile!,
+          userId,
+          regId,
+          'signature'
+        );
+
+      // Upload ID proof
+      const idProofUrl = await this.s3UploadService.uploadToS3UsingPresignedUrl(
+        this.idProofFile!,
+        userId,
+        regId,
+        'id_proof'
+      );
+
+      // Now you can save these URLs to your database
+      console.log('Uploaded files:', {
+        photoUrl,
+        signatureUrl,
+        idProofUrl,
+      });
+
+      let changedValues: any = {};
+      changedValues['userId'] = userId;
+      changedValues['progress'] = 40;
+      changedValues['testLevel'] = this.registrationFormData['testLevel'];
+      changedValues['documentSubmissionDate'] = new Date().toISOString();
+      changedValues['uploadedDocuments'] = {
+        photo: photoUrl,
+        signature: signatureUrl,
+        id_proof: idProofUrl,
+      };
+
+      if (this.registrationFormId != '') {
+        changedValues['id'] = this.registrationFormId;
+      }
+
+      this.backendService.save(changedValues).subscribe(
+        (result) => {
+          this.registrationFormId = result.data.id;
+          console.log('result', result);
+
+          this.completePhase('upload-documents');
+        },
+        (error: any) => {
+          //console.log('!! error from updateAPI', error);
+        }
+      );
+
+      // Show success message
+      // this.uploadSuccess.emit({
+      //   photoUrl,
+      //   signatureUrl,
+      //   idProofUrl
+      // });
+    } catch (error) {
+      console.error('Upload failed:', error);
+      // this.uploadError.emit('Failed to upload documents. Please try again.');
+    }
+  }
+
   createForm(): FormGroup {
     const communicationGroup = this.fb.group({});
     this.communicationPersons.forEach((person) => {
@@ -554,6 +705,10 @@ export class RegistrationFormComponent {
   }
 
   isPhaseAccessible(phaseId: string): boolean {
+    let progress = this.registrationFormData.progress || 0;
+
+    if (progress < 20) {
+    }
     const currentIndex = this.phases.findIndex(
       (p) => p.id === this.currentPhase
     );
@@ -566,13 +721,28 @@ export class RegistrationFormComponent {
   navigateToPhase(phaseId: string): void {
     if (this.isPhaseAccessible(phaseId)) {
       this.currentPhase = phaseId;
+      console.log('Current Phase', this.currentPhase);
       if (phaseId == 'registration-form') {
         this.registrationForm = this.createForm();
+        this.patchFormValues(this.registrationFormData);
+      } else if (phaseId == 'payment') {
+        let level =
+          this.registrationForm.value.testLevel ||
+          this.registrationFormData.testLevel;
+
+        this.paymentAmt = this.levelWisePayment[level];
+      } else if (phaseId == 'upload-documents') {
+        this.invalidUpload = false;
+      } else if (phaseId == 'undertaking') {
+        console.log('Undertaking phase');
+
+        this.constructUnderTakingDetail();
       }
     }
   }
 
   completePhase(phaseId: string): void {
+    console.log("COmpleteting phase",phaseId)
     if (!this.completedPhases.includes(phaseId)) {
       this.completedPhases.push(phaseId);
     }
@@ -583,6 +753,21 @@ export class RegistrationFormComponent {
       this.currentPhase = this.phases[currentIndex + 1].id;
       if (phaseId == 'registration-form') {
         this.registrationForm = this.createForm();
+        this.patchFormValues(this.registrationFormData);
+      } else if (phaseId == 'payment') {
+        let level =
+          this.registrationForm.value.testLevel ||
+          this.registrationFormData.testLevel;
+
+        this.paymentAmt = this.levelWisePayment[level];
+
+        if(this.registrationFormData.hasOwnProperty('pid')){
+          this.paymentDone = true
+        }
+      } else if (phaseId == 'upload-documents') {
+        this.invalidUpload = false;
+      } else if (phaseId == 'undertaking') {
+        this.constructUnderTakingDetail();
       }
     }
   }
@@ -595,18 +780,50 @@ export class RegistrationFormComponent {
       this.currentPhase = this.phases[currentIndex - 1].id;
       if (this.currentPhase == 'registration-form') {
         this.registrationForm = this.createForm();
+        this.patchFormValues(this.registrationFormData);
+      } else if (this.currentPhase == 'payment') {
+        let level =
+          this.registrationForm.value.testLevel ||
+          this.registrationFormData.testLevel;
+
+        this.paymentAmt = this.levelWisePayment[level];
+        if(this.registrationFormData.hasOwnProperty('pid')){
+          this.paymentDone = true
+        }
+      } else if ((this.currentPhase = 'upload-documents')) {
+        this.invalidUpload = false;
+      } else if ((this.currentPhase = 'undertaking')) {
+        this.constructUnderTakingDetail();
       }
     }
   }
 
   calculateProgress(): number {
-    return Math.round((this.completedPhases.length / this.phases.length) * 100);
+    return this.registrationFormData.progress || 0;
   }
 
   submitRegistration(): void {
     // In a real app, this would submit to your backend
     console.log('Registration submitted');
-    this.completePhase('review');
+    let changedValues:any = {};
+      changedValues['userId'] = localStorage.getItem('userId');
+      changedValues['progress'] = 100;
+      changedValues['testLevel'] = this.registrationFormData['testLevel'];
+      changedValues['finalSubmissionDate'] =  new Date().toISOString();
+
+      if (this.registrationFormId != '') {
+        changedValues['id'] = this.registrationFormId;
+      }
+
+      this.backendService.save(changedValues).subscribe(
+        (result) => {
+          // this.registrationFormId = result.data.id;
+          this.completePhase('review');
+        },
+        (error: any) => {
+          //console.log('!! error from updateAPI', error);
+        }
+      );
     // Then navigate to confirmation page
   }
 
@@ -683,6 +900,8 @@ export class RegistrationFormComponent {
     } else {
       let changedValues = this.getChangedValues(this.registrationForm);
       changedValues['userId'] = localStorage.getItem('userId');
+      changedValues['progress'] = 10;
+      changedValues['testLevel'] = this.registrationForm.value['testLevel'];
 
       if (this.registrationFormId != '') {
         changedValues['id'] = this.registrationFormId;
@@ -705,6 +924,7 @@ export class RegistrationFormComponent {
     console.log('Form submitted:', this.registrationForm.value);
     let submitValue = this.registrationForm.value;
     submitValue['userId'] = localStorage.getItem('userId');
+    submitValue['progress'] = 20;
     if (this.registrationFormId != '') {
       submitValue['id'] = this.registrationFormId;
     }
@@ -725,7 +945,7 @@ export class RegistrationFormComponent {
   }
 
   makePayment() {
-    const amount = 50000; // in paise (₹500)
+    const amount = this.paymentAmt * 100; // in paise (₹500)
 
     this.backendService.createOrder(amount).subscribe((order) => {
       const options = {
@@ -741,6 +961,43 @@ export class RegistrationFormComponent {
             .verifyAndFetchDetails(response)
             .subscribe((details) => {
               console.log('✅ Full Payment Details:', details);
+              details['userId'] = localStorage.getItem('userId') || '';
+              details['formId'] = this.registrationFormId;
+              this.backendService.savePayment(details).subscribe(
+                (result:any) => {
+                  console.log('result', result);
+                  let pid = result.data.pid;
+                  let changedValues: any = {};
+                  changedValues['userId'] =
+                    localStorage.getItem('userId') || '';
+                  changedValues['progress'] = 80;
+                  changedValues['testLevel'] =
+                    this.registrationFormData['testLevel'];
+                  changedValues['paymentDate'] = new Date().toISOString();
+                  changedValues['pid'] = pid;
+                  changedValues['paymentAmount'] = details.amount / 100;
+
+                  if (this.registrationFormId != '') {
+                    changedValues['id'] = this.registrationFormId;
+                  }
+
+                  this.backendService.save(changedValues).subscribe(
+                    (result) => {
+                      console.log('result', result);
+                      this.paymentDone = true;
+                      this.completePhase('payment')
+                    },
+                    (error: any) => {
+                      console.log('!! error from updateAPI', error);
+                    }
+                  );
+
+                  // this.completePhase('payment')
+                },
+                (error: any) => {
+                  console.log('!! error from updateAPI', error);
+                }
+              );
               // Now you can generate GST sheet or store to DB
             });
           // You can call your backend to verify payment here
@@ -759,4 +1016,244 @@ export class RegistrationFormComponent {
       rzp.open();
     });
   }
+
+  toggleNewRegistartion(value: any) {
+    if (value.id) {
+      this.backendService.getFormsById(value.id).subscribe({
+        next: (res) => {
+          this.registrationFormData = res.data;
+          this.registrationFormId = res.data.id || '';
+          let progress = res.data.progress || 0;
+          if (progress < 10) {
+            this.currentPhase = 'important-notes';
+          } else if (progress >= 10 && progress < 20) {
+            this.currentPhase = 'registration-form';
+            this.registrationForm = this.createForm();
+            this.patchFormValues(res.data);
+            this.completedPhases.push('important-notes');
+          } else if (progress >= 20 && progress < 40) {
+            this.currentPhase = 'upload-documents';
+            this.invalidUpload = false;
+            this.completedPhases.push('important-notes');
+            this.completedPhases.push('registration-form');
+          } else if (progress >= 40 && progress < 60) {
+            this.currentPhase = 'undertaking';
+            this.agreeTermsUndertaking = res.data.acceptUnderTakingAndAffidavit;
+            this.completedPhases.push('important-notes');
+            this.completedPhases.push('registration-form');
+            this.completedPhases.push('upload-documents');
+            this.constructUnderTakingDetail();
+          } else if (progress >= 60 && progress < 80) {
+            this.currentPhase = 'payment';
+            let level =
+              this.registrationForm.value.testLevel ||
+              this.registrationFormData.testLevel;
+
+            this.paymentAmt = this.levelWisePayment[level];
+            this.completedPhases.push('important-notes');
+            this.completedPhases.push('registration-form');
+            this.completedPhases.push('upload-documents');
+            this.completedPhases.push('undertaking');
+          } else if (progress >= 80 && progress < 100) {
+            this.currentPhase = 'review';
+            this.completedPhases.push('important-notes');
+            this.completedPhases.push('registration-form');
+            this.completedPhases.push('upload-documents');
+            this.completedPhases.push('undertaking');
+            this.completedPhases.push('payment');
+          } else if (progress >= 100) {
+            this.completedPhases.push('important-notes');
+            this.completedPhases.push('registration-form');
+            this.completedPhases.push('upload-documents');
+            this.completedPhases.push('undertaking');
+            this.completedPhases.push('payment');
+            this.completedPhases.push('review');
+          }
+
+          if(this.registrationFormData.hasOwnProperty('pid')){
+          this.paymentDone = true
+        }
+          this.newRegistration = value;
+        },
+        error: (err) => {
+          // this.isLoading = false;
+        },
+      });
+    } else {
+      this.newRegistration = value;
+      this.registrationFormData = {};
+      this.completedPhases = [];
+      this.registrationFormId = '';
+    }
+  }
+
+  patchFormValues(apiData: any) {
+    // Patch the form with API data
+    this.registrationForm.patchValue({
+      specialArrangement: apiData.specialArrangement,
+      testLevel: apiData.testLevel,
+      testSite: 'Pune', // Since it's disabled, you might not need to patch this
+      firstName: apiData.firstName,
+      middleName: apiData.middleName,
+      lastName: apiData.lastName,
+      gender: apiData.gender,
+      nativeLanguage: apiData.nativeLanguage,
+      passcode: apiData.passcode,
+      regSeq: apiData.regSeq,
+      dob: apiData.dob,
+      address1: apiData.address1,
+      address2: apiData.address2,
+      country: apiData.country,
+      pincode: apiData.pincode,
+      sameAsAddress: apiData.sameAsAddress,
+      institution: apiData.institution,
+      learningPlace: apiData.learningPlace,
+      examReason: apiData.examReason,
+      occupation: apiData.occupation,
+      occupationalDetails: apiData.occupationalDetails,
+      agreeTerms: apiData.agreeTerms,
+    });
+
+    // Patch the communication group
+    const communicationGroup = this.registrationForm.get(
+      'communication'
+    ) as FormGroup;
+    if (apiData.communication) {
+      Object.keys(apiData.communication).forEach((key) => {
+        if (communicationGroup.get(key)) {
+          communicationGroup.get(key)?.patchValue(apiData.communication[key]);
+        }
+      });
+    }
+
+    // Patch the attempts array
+    const attemptsArray = this.registrationForm.get('attempts') as FormArray;
+    if (apiData.attempts)
+      apiData.attempts.forEach((attempt: any, index: any) => {
+        if (attemptsArray.at(index)) {
+          attemptsArray.at(index).patchValue(attempt);
+        }
+      });
+
+    // Patch mediaContacts
+    const mediaContactsArray = this.registrationForm.get(
+      'mediaContacts'
+    ) as FormArray;
+    if (apiData.mediaContacts)
+      apiData.mediaContacts.forEach((contact: any) => {
+        mediaContactsArray.push(this.fb.control(contact));
+      });
+  }
+
+  constructUnderTakingDetail() {
+    let name = '';
+    if (this.registrationFormData.firstName) {
+      name += this.registrationFormData.firstName;
+    }
+    if (this.registrationFormData.lastName) {
+      name += ' ' + this.registrationFormData.lastName;
+    }
+
+    let dob = '';
+    if (this.registrationFormData.dob) {
+      dob = new Date(this.registrationFormData.dob).toLocaleDateString('en-US');
+    }
+
+    let address = '';
+    if (this.registrationFormData.address1) {
+      address += this.registrationFormData.address1;
+    }
+    if (this.registrationFormData.address2) {
+      address += ' ' + this.registrationFormData.address2;
+    }
+
+    let institution = '';
+    if (this.registrationFormData.institution) {
+      institution = this.registrationFormData.institution;
+    }
+
+    let testLevel = '';
+    if (this.registrationFormData.testLevel) {
+      testLevel = this.registrationFormData.testLevel;
+    }
+
+    this.underTakingDetails = {
+      name: name,
+      dob: dob,
+      address: address,
+      institution: institution,
+      testLevel: testLevel,
+      date: new Date().toLocaleDateString('en-US'),
+    };
+
+    if (
+      this.registrationFormData.hasOwnProperty('acceptUnderTakingAndAffidavit')
+    ) {
+      this.agreeTermsUndertaking =
+        this.registrationFormData.acceptUnderTakingAndAffidavit;
+    }
+  }
+
+
+  // Helper methods to get display values
+getLanguageName(code: string): string {
+  const lang = this.languages.find(l => l.value === code);
+  return lang ? lang.label : code;
+}
+
+getLearningPlace(code: number): string {
+  const places = [
+    { value: '1', label: 'School' },
+    { value: '2', label: 'Private Language School' },
+    { value: '3', label: 'University' },
+    { value: '4', label: 'Self-study' },
+    { value: '5', label: 'Other' }
+  ];
+  const place = this.learningPlaces.find(p => p.value == code);
+  return place ? place.label : code + '';
+}
+
+getExamReason(code: number): string {
+  const reasons = [
+    { value: '1', label: 'For Employment' },
+    { value: '2', label: 'For Promotion' },
+    { value: '3', label: 'For Higher Education' },
+    { value: '4', label: 'Personal Interest' },
+    { value: '5', label: 'Other' }
+  ];
+  const reason = this.examReasons.find(r => r.value == code);
+  return reason ? reason.label : code + '';
+}
+
+getOccupation(code: number): string {
+  const occupations = [
+    { value: '1', label: 'Student' },
+    { value: '2', label: 'Company Employee' },
+    { value: '3', label: 'Government Employee' },
+    { value: '4', label: 'Self-employed' },
+    { value: '5', label: 'Other' }
+  ];
+  const occupation = this.occupationalDetails.find(o => o.value == code);
+  return occupation ? occupation.label : code + '';
+}
+
+getMediaContact(code: number): string {
+  const mediaContacts = [
+    { value: 1, label: 'TV/Radio' },
+    { value: 2, label: 'Newspapers/Magazines' },
+    { value: 3, label: 'Books' },
+    { value: 4, label: 'Internet' },
+    { value: 5, label: 'Friends/Family' },
+    { value: 6, label: 'School' },
+    { value: 7, label: 'Other' }
+  ];
+  const media = this.mediaContacts.find(m => m.value === code);
+  return media ? media.label : code.toString();
+}
+
+finalSubmit() {
+  // Handle final submission logic here
+  console.log('Final submission:', this.registrationFormData);
+
+}
 }

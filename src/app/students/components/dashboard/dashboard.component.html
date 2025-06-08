@@ -1,6 +1,6 @@
 <app-header-student></app-header-student>
 
-<div class="dashboard-container">
+<div class="dashboard-container" *ngIf="!isLoading">
     <div class="dashboard-header">
       <h1>Welcome Back, {{userName}}!</h1>
       <p class="japanese-greeting">おかえりなさい!</p>
@@ -19,7 +19,7 @@
             </span>
             <button class="register-btn" 
                     [disabled]="level.remainingSeats === 0"
-                    routerLink="/registration" 
+                    routerLink="/student/registration" 
                     [queryParams]="{level: level.level}">
               {{level.remainingSeats === 0 ? 'Waitlist' : 'Register'}}
             </button>
@@ -44,7 +44,7 @@
             <span class="progress-percent">{{exam.progress}}% complete</span>
           </div>
         </div>
-        <button class="card-button" routerLink="/student/status">View All Status</button>
+        <button class="card-button" routerLink="/student/registration">View All Status</button>
       </div>
   
       <!-- Quick Actions Card -->
@@ -53,19 +53,19 @@
           <h2>⚡ Quick Actions</h2>
         </div>
         <div class="actions-grid">
-          <a routerLink="/registration" class="action-item">
+          <a routerLink="/student/registration" class="action-item">
             <div class="action-icon">📝</div>
             <span>Register for Exam</span>
           </a>
-          <a routerLink="/history" class="action-item">
+          <a routerLink="/student/history" class="action-item">
             <div class="action-icon">📚</div>
             <span>View History</span>
           </a>
-          <a href="#" class="action-item">
+          <a href="https://www.jlpt.jp/e/reference/books.html" class="action-item"  target="_blank" rel="noopener noreferrer">
             <div class="action-icon">📖</div>
             <span>Study Materials</span>
           </a>
-          <a routerLink="/profile" class="action-item">
+          <a routerLink="/student/profile" class="action-item">
             <div class="action-icon">👤</div>
             <span>Update Profile</span>
           </a>

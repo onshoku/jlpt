@@ -1,9 +1,17 @@
-<app-header-student></app-header-student>
+<!-- <app-header-student></app-header-student> -->
 
-<div class="status-container">
+<div class="status-container" *ngIf="!isLoading">
     <div class="status-header">
-      <h1>Your Exam Registrations</h1>
-      <p class="subtitle">Current Term: {{currentTerm}}</p>
+      <div>
+
+        <h1>Your Exam Registrations</h1>
+        <p class="subtitle">Current Term: {{currentTerm}}</p>
+      </div>
+
+      <div>
+
+        <button class="register-button" (click)="emitRegistrationEvent()">Start New Registration</button>
+      </div>
     </div>
   
     <div class="registration-status">
@@ -102,4 +110,4 @@
         </a>
       </div>
     </div>
-  </div>
+</div>

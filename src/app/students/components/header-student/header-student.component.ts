@@ -20,6 +20,10 @@ export class HeaderStudentComponent {
 
   ngOnInit(): void {
     this.checkMobileView();
+
+    let fullName = localStorage.getItem('name') || 'Student';
+    let splitName = fullName.split(' ')
+    this.userName = splitName[0];
     // Initialize user data from service
   }
 

@@ -9,11 +9,11 @@
     <div class="term-selector">
       <label for="term-select">Select Examination Term:</label>
       <select id="term-select" [(ngModel)]="selectedTermId" (change)="onTermChange()">
-        <option *ngFor="let term of examTerms" [value]="term.id">{{term.name}} ({{term.period}})</option>
+        <option *ngFor="let term of examTerms" [value]="term.id">{{term.name}}</option>
       </select>
     </div>
   
-    <div class="history-content" *ngIf="selectedTerm">
+    <div class="history-content" *ngIf="selectedTerm && !isLoading">
       <div class="term-info">
         <h2>{{selectedTerm.name}} Examination</h2>
         <p class="exam-period">{{selectedTerm.period}}</p>
@@ -26,14 +26,14 @@
               <span class="level-badge">JLPT {{exam.level}}</span>
               <span class="exam-date">{{exam.date | date:'mediumDate'}}</span>
             </div>
-            <div class="exam-status">
+            <!-- <div class="exam-status">
               <span class="status-badge" [ngClass]="getStatusClass(exam.status)">
                 {{exam.status}}
               </span>
               <span class="score" *ngIf="exam.score">
                 Score: {{exam.score}}/180
               </span>
-            </div>
+            </div> -->
           </div>
   
           <div class="exam-details">
@@ -52,10 +52,10 @@
           </div>
   
           <div class="exam-actions">
-            <a *ngIf="exam.resultAvailable" [href]="exam.resultLink" class="action-button result-button">
+            <!-- <a *ngIf="exam.resultAvailable" [href]="exam.resultLink" class="action-button result-button">
               <span class="icon">📊</span>
               View Result
-            </a>
+            </a> -->
             <button class="action-button details-button" (click)="viewDetails(exam)">
               <span class="icon">📋</span>
               View Details
@@ -72,7 +72,7 @@
           </div>
         </div>
   
-        <div class="empty-term" *ngIf="selectedTerm.exams.length === 0">
+        <div class="empty-term" *ngIf="selectedTerm.exams == undefined || selectedTerm.exams.length === 0">
           <div class="empty-icon">📭</div>
           <h3>No Registrations Found</h3>
           <p>You didn't register for this examination term.</p>

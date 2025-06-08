@@ -8,11 +8,28 @@
 
   .status-header {
     margin-bottom: 2rem;
+    display: flex;
+    justify-content: space-between;
 
     h1 {
       font-size: 2rem;
       color: $color-dark;
       margin-bottom: 0.5rem;
+    }
+
+    .register-button{
+background-color: $color-dark;
+      color: white;
+      padding: 0.5rem;
+      font-size: 0.8rem;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.3s ease-in-out;
+
+      &:hover {
+        background-color: darken($color-dark, 10%);
+      }
     }
 
     .subtitle {

@@ -1,8 +1,22 @@
 <app-header-student></app-header-student>
 
-<div class="registration-container">
+<app-status
+  *ngIf="!newRegistration"
+  (startNewRegistartion)="toggleNewRegistartion($event)"
+></app-status>
+
+<div class="registration-container" *ngIf="newRegistration">
   <div class="registration-header">
-    <h1>JLPT Registration</h1>
+    <div class="main-header">
+      <div
+        class="breadcrumb-divider"
+        *ngIf="!hasQueryParams"
+        (click)="toggleNewRegistartion(false)"
+      >
+        ❮
+      </div>
+      <h1>JLPT Registration</h1>
+    </div>
     <p class="subtitle">
       Japanese Language Proficiency Test - {{ currentTerm }}
     </p>
@@ -70,7 +84,9 @@
         </p>
 
         <form [formGroup]="registrationForm">
-          <button type="button" class="action-buttons" (click)="saveProgress()">Save Progress</button>
+          <button type="button" class="action-buttons" (click)="saveProgress()">
+            Save Progress
+          </button>
           <!-- Special Arrangements Section -->
           <div class="form-section">
             <h3 class="section-title">
@@ -556,11 +572,14 @@
             <div class="form-field">
               <label>
                 <input type="checkbox" formControlName="agreeTerms" required />
-                  I agree to &nbsp;
-                  <a href="link-to-test-guide" target="_blank">the test guide</a>,&nbsp;
-                  <a href="link-to-undertaking" target="_blank">the undertaking </a>, and &nbsp;
-                  <a href="link-to-affidavit" target="_blank"> the affidavit.</a>
-                  <span class="tooltip-icon" [matTooltip]="termsTooltip">?</span>
+                I agree to &nbsp;
+                <a href="link-to-test-guide" target="_blank">the test guide</a
+                >,&nbsp;
+                <a href="link-to-undertaking" target="_blank"
+                  >the undertaking </a
+                >, and &nbsp;
+                <a href="link-to-affidavit" target="_blank"> the affidavit.</a>
+                <span class="tooltip-icon" [matTooltip]="termsTooltip">?</span>
               </label>
               <span
                 class="error-message"
@@ -584,7 +603,10 @@
       </div>
 
       <!-- Upload Documents Phase -->
-      <div *ngSwitchCase="'upload-documents'" class="phase-upload-documents document-upload">
+      <div
+        *ngSwitchCase="'upload-documents'"
+        class="phase-upload-documents document-upload"
+      >
         <h2>Document Upload</h2>
         <p class="phase-description">
           Upload required documents for verification
@@ -757,12 +779,14 @@
 
         <div class="action-buttons">
           <button class="back-button" (click)="previousPhase()">Back</button>
-          <button
-            class="next-button"
-            (click)="completePhase('upload-documents')"
-          >
-            Continue to Payment
+          <!-- (click)="completePhase('upload-documents')" -->
+          <button class="next-button" (click)="uploadPictures()">
+            Upload & Continue
           </button>
+        </div>
+
+        <div class="errorClass" *ngIf="invalidUpload">
+          Please upload all documents correctly before proceeding.
         </div>
       </div>
 
@@ -771,46 +795,639 @@
         <h2>Undertaking and Affidavit</h2>
         <p class="phase-description">Please read and accept the terms</p>
         <!-- Undertaking content will go here -->
+        <div class="legal-documents-container">
+          <!-- Undertaking Section -->
+          <div class="document-section undertaking">
+            <h2 class="document-title">Undertaking</h2>
+            <div class="document-content">
+              <p class="document-text">
+                I undersigned <b>{{ underTakingDetails.name }}</b> (Date of
+                Birth <b>{{ underTakingDetails.dob }}</b
+                >) living at - <i>{{ underTakingDetails.address }} </i>. As per
+                the terms & conditions stated/given on JALTAP website regarding
+                payment, refund & others, I confirm that all information
+                provided is correct. I undertake full responsibility for all
+                filled and given information.
+              </p>
+
+              <div class="signature-fields">
+                <div class="signature-field">
+                  <p>
+                    Date: <b>{{ underTakingDetails.date }}</b>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Affidavit Section -->
+          <div class="document-section affidavit">
+            <h2 class="document-title">Affidavit</h2>
+            <div class="document-content">
+              <p class="document-text">
+                I undersigned <b>{{ underTakingDetails.name }}</b> (Date of
+                Birth <b>{{ underTakingDetails.dob }}</b
+                >) living at - <i>{{ underTakingDetails.address }} </i> hereby
+                solemnly affirm & declare as under:
+              </p>
+
+              <ol class="affidavit-points">
+                <li>
+                  I am a student of
+                  {{ underTakingDetails.institution }} for N{{
+                    underTakingDetails.testLevel
+                  }}
+                  (Level)
+                </li>
+                <li>
+                  I will follow all rules & regulations of JALTAP as
+                  communicated from time to time
+                </li>
+                <li>
+                  As per the terms & conditions stated/given on JALTAP website
+                  regarding payment, refund & others, I have read them carefully
+                  and confirm all provided information is correct
+                </li>
+                <li>
+                  I have fully understood that if any information given/filled
+                  by me is incorrect, I will bear full responsibility for all
+                  consequences and disciplinary actions
+                </li>
+              </ol>
+
+              <div class="signature-fields">
+                <div class="signature-field">
+                  <p>
+                    Date: <b>{{ underTakingDetails.date }}</b>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Declaration Checkbox -->
+          <div class="declaration-check">
+            <input
+              type="checkbox"
+              [(ngModel)]="agreeTermsUndertaking"
+              required
+            />
+            I hereby declare that I have read and understood both the
+            Undertaking and Affidavit, and I agree to abide by all terms and
+            conditions mentioned above.
+          </div>
+        </div>
         <div class="action-buttons">
           <button class="back-button" (click)="previousPhase()">Back</button>
-          <button class="next-button" (click)="completePhase('undertaking')">
+          <button class="next-button" (click)="acceptUndertakingForm()">
             Accept & Continue to Payment
           </button>
+        </div>
+        <div class="errorClass" *ngIf="!agreeTermsUndertaking">
+          Please agree to the terms above.
         </div>
       </div>
 
       <!-- Payment Phase -->
       <div *ngSwitchCase="'payment'" class="phase-content phase-payment">
-  <h2>Payment</h2>
-  <p class="phase-description">Complete your registration payment.</p>
+        <h2>Payment</h2>
+        <p class="phase-description">Complete your registration payment.</p>
 
-  <!-- Payment Instructions (Optional) -->
-  <div class="payment-instructions">
-    <p>Please click the button below to proceed to payment. You will be redirected to Razorpay’s secure checkout.</p>
-  </div>
+        <!-- Payment Instructions (Optional) -->
+        <div class="payment-instructions" *ngIf="!paymentDone">
+          <p>
+            Please click the button below to proceed to payment of
+            <b>₹{{ paymentAmt }} </b>. You will be redirected to Razorpay’s
+            secure checkout.
+          </p>
+        </div>
 
-  <!-- Razorpay Button -->
-  <div class="payment-section">
-    <button class="pay-now-button" (click)="makePayment()">Pay Now</button>
-  </div>
+        <div class="payment-instructions-done" *ngIf="paymentDone">
+          <p>
+            Payment of
+            <b>₹{{ paymentAmt }} </b> is suceessful.
+          </p>
+        </div>
 
-  <div class="action-buttons">
-    <button class="back-button" (click)="previousPhase()">Back</button>
-    <button class="next-button" (click)="completePhase('payment')">Proceed to Review</button>
-  </div>
-</div>
+        <!-- Razorpay Button -->
+        <div class="payment-section" *ngIf="!paymentDone">
+          <button
+            class="pay-now-button"
+            (click)="makePayment()"
+            [disabled]="paymentDone"
+          >
+            Pay Now
+          </button>
+        </div>
 
-
-      <!-- Review Phase -->
-      <div *ngSwitchCase="'review'" class="phase-review">
-        <h2>Review Your Registration</h2>
-        <p class="phase-description">
-          Verify all information before submission
-        </p>
-        <!-- Review content will go here -->
         <div class="action-buttons">
           <button class="back-button" (click)="previousPhase()">Back</button>
-          <button class="submit-button" (click)="submitRegistration()">
+          <button class="next-button" (click)="completePhase('payment')">
+            Proceed to Review
+          </button>
+        </div>
+      </div>
+
+      <!-- Review Phase -->
+      <div class="review-section" *ngSwitchCase="'review'">
+        <h2>Review Your Registration</h2>
+        <p class="review-description">
+          Please review all the information below before submitting your JLPT
+          registration. If you need to make changes, click the "Back" button to
+          edit your information.
+        </p>
+
+        <div class="review-content">
+          <!-- Form Data Review -->
+          <div class="form-review">
+            <!-- Test Information -->
+            <div class="review-section">
+              <h3 class="section-title">
+                <span class="english">Test Information</span>
+                <span class="japanese">試験情報</span>
+              </h3>
+              <div class="review-field">
+                <span class="field-label">Test Level:</span>
+                <span class="field-value"
+                  >N{{ registrationFormData.testLevel }}</span
+                >
+              </div>
+              <div class="review-field">
+                <span class="field-label">Time of Exam:</span>
+                <span class="field-value">{{
+                  registrationFormData.timeOfExam
+                }}</span>
+              </div>
+            </div>
+
+            <!-- Personal Details -->
+            <div class="review-section">
+              <h3 class="section-title">
+                <span class="english">Personal Details</span>
+                <span class="japanese">個人情報</span>
+              </h3>
+              <div class="review-field">
+                <span class="field-label">Full Name:</span>
+                <span class="field-value">
+                  {{ registrationFormData.firstName }}
+                  {{ registrationFormData.middleName }}
+                  {{ registrationFormData.lastName }}
+                </span>
+              </div>
+              <div class="review-field">
+                <span class="field-label">SEQ:</span>
+                <span class="field-value">{{
+                  registrationFormData.regSeq
+                }}</span>
+              </div>
+              <div class="review-field">
+                <span class="field-label">Gender:</span>
+                <span class="field-value">{{
+                  registrationFormData.gender | titlecase
+                }}</span>
+              </div>
+              <div class="review-field">
+                <span class="field-label">Native Language:</span>
+                <span class="field-value">{{
+                  getLanguageName(registrationFormData.nativeLanguage)
+                }}</span>
+              </div>
+              <div class="review-field">
+                <span class="field-label">Date of Birth:</span>
+                <span class="field-value">{{
+                  registrationFormData.dob | date : "mediumDate"
+                }}</span>
+              </div>
+              <div class="review-field">
+                <span class="field-label">Passcode:</span>
+                <span class="field-value">••••••••</span>
+              </div>
+            </div>
+
+            <!-- Address -->
+            <div class="review-section">
+              <h3 class="section-title">
+                <span class="english">Address</span>
+                <span class="japanese">住所</span>
+              </h3>
+              <div class="review-field">
+                <span class="field-label">House/Apt/Street:</span>
+                <span class="field-value">{{
+                  registrationFormData.address1
+                }}</span>
+              </div>
+              <div class="review-field">
+                <span class="field-label">City/State:</span>
+                <span class="field-value">{{
+                  registrationFormData.address2
+                }}</span>
+              </div>
+              <div class="review-field">
+                <span class="field-label">Country:</span>
+                <span class="field-value">{{
+                  registrationFormData.country
+                }}</span>
+              </div>
+              <div class="review-field">
+                <span class="field-label">Pincode:</span>
+                <span class="field-value">{{
+                  registrationFormData.pincode
+                }}</span>
+              </div>
+            </div>
+
+            <!-- Other Details -->
+            <div class="review-section">
+              <h3 class="section-title">
+                <span class="english">Other Details</span>
+                <span class="japanese">その他の詳細</span>
+              </h3>
+              <div class="review-field">
+                <span class="field-label">Institution Studying Japanese:</span>
+                <span class="field-value">{{
+                  registrationFormData.institution
+                }}</span>
+              </div>
+              <div class="review-field">
+                <span class="field-label">Place of Learning Japanese:</span>
+                <span class="field-value">{{
+                  getLearningPlace(registrationFormData.learningPlace)
+                }}</span>
+              </div>
+              <div class="review-field">
+                <span class="field-label">Reason for Taking Exam:</span>
+                <span class="field-value">{{
+                  getExamReason(registrationFormData.examReason)
+                }}</span>
+              </div>
+              <div class="review-field">
+                <span class="field-label">Occupation:</span>
+                <span class="field-value">{{
+                  getOccupation(registrationFormData.occupation)
+                }}</span>
+              </div>
+            </div>
+
+            <!-- Media Contacts -->
+            <div
+              class="review-section"
+              *ngIf="registrationFormData.mediaContacts?.length > 0"
+            >
+              <h3 class="section-title">
+                <span class="english">Japanese Media Contact</span>
+                <span class="japanese">日本語メディア接触</span>
+              </h3>
+              <div class="review-field">
+                <span class="field-label">Media:</span>
+                <span class="field-value">
+                  <span
+                    *ngFor="let media of registrationFormData.mediaContacts"
+                  >
+                    {{ getMediaContact(media) }}<br />
+                  </span>
+                </span>
+              </div>
+            </div>
+
+            <!-- Communication -->
+            <div class="review-section">
+              <h3 class="section-title">
+                <span class="english">Japanese Communication</span>
+                <span class="japanese">日本語コミュニケーション</span>
+              </h3>
+              <div class="communication-review">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Person</th>
+                      <th>Speaking</th>
+                      <th>Listening</th>
+                      <th>Reading</th>
+                      <th>Writing</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Teacher</td>
+                      <td>
+                        {{
+                          registrationFormData.communication.teacher.speaking
+                            ? "✓"
+                            : ""
+                        }}
+                      </td>
+                      <td>
+                        {{
+                          registrationFormData.communication.teacher.listening
+                            ? "✓"
+                            : ""
+                        }}
+                      </td>
+                      <td>
+                        {{
+                          registrationFormData.communication.teacher.reading
+                            ? "✓"
+                            : ""
+                        }}
+                      </td>
+                      <td>
+                        {{
+                          registrationFormData.communication.teacher.writing
+                            ? "✓"
+                            : ""
+                        }}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>Family</td>
+                      <td>
+                        {{
+                          registrationFormData.communication.family.speaking
+                            ? "✓"
+                            : ""
+                        }}
+                      </td>
+                      <td>
+                        {{
+                          registrationFormData.communication.family.listening
+                            ? "✓"
+                            : ""
+                        }}
+                      </td>
+                      <td>
+                        {{
+                          registrationFormData.communication.family.reading
+                            ? "✓"
+                            : ""
+                        }}
+                      </td>
+                      <td>
+                        {{
+                          registrationFormData.communication.family.writing
+                            ? "✓"
+                            : ""
+                        }}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>Friends</td>
+                      <td>
+                        {{
+                          registrationFormData.communication.friends.speaking
+                            ? "✓"
+                            : ""
+                        }}
+                      </td>
+                      <td>
+                        {{
+                          registrationFormData.communication.friends.listening
+                            ? "✓"
+                            : ""
+                        }}
+                      </td>
+                      <td>
+                        {{
+                          registrationFormData.communication.friends.reading
+                            ? "✓"
+                            : ""
+                        }}
+                      </td>
+                      <td>
+                        {{
+                          registrationFormData.communication.friends.writing
+                            ? "✓"
+                            : ""
+                        }}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>Colleagues</td>
+                      <td>
+                        {{
+                          registrationFormData.communication.colleagues.speaking
+                            ? "✓"
+                            : ""
+                        }}
+                      </td>
+                      <td>
+                        {{
+                          registrationFormData.communication.colleagues
+                            .listening
+                            ? "✓"
+                            : ""
+                        }}
+                      </td>
+                      <td>
+                        {{
+                          registrationFormData.communication.colleagues.reading
+                            ? "✓"
+                            : ""
+                        }}
+                      </td>
+                      <td>
+                        {{
+                          registrationFormData.communication.colleagues.writing
+                            ? "✓"
+                            : ""
+                        }}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>Supervisor</td>
+                      <td>
+                        {{
+                          registrationFormData.communication.supervisor.speaking
+                            ? "✓"
+                            : ""
+                        }}
+                      </td>
+                      <td>
+                        {{
+                          registrationFormData.communication.supervisor
+                            .listening
+                            ? "✓"
+                            : ""
+                        }}
+                      </td>
+                      <td>
+                        {{
+                          registrationFormData.communication.supervisor.reading
+                            ? "✓"
+                            : ""
+                        }}
+                      </td>
+                      <td>
+                        {{
+                          registrationFormData.communication.supervisor.writing
+                            ? "✓"
+                            : ""
+                        }}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>Customers</td>
+                      <td>
+                        {{
+                          registrationFormData.communication.customers.speaking
+                            ? "✓"
+                            : ""
+                        }}
+                      </td>
+                      <td>
+                        {{
+                          registrationFormData.communication.customers.listening
+                            ? "✓"
+                            : ""
+                        }}
+                      </td>
+                      <td>
+                        {{
+                          registrationFormData.communication.customers.reading
+                            ? "✓"
+                            : ""
+                        }}
+                      </td>
+                      <td>
+                        {{
+                          registrationFormData.communication.customers.writing
+                            ? "✓"
+                            : ""
+                        }}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Previous Attempts -->
+            <div class="review-section">
+              <h3 class="section-title">
+                <span class="english">Previous JLPT Attempts</span>
+                <span class="japanese">以前のJLPT受験</span>
+              </h3>
+              <div class="attempts-review">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Level</th>
+                      <th>Times Taken</th>
+                      <th>Last Attempt Result</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let attempt of registrationFormData.attempts">
+                      <td>N{{ attempt.level }}</td>
+                      <td>{{ attempt.attempts }}</td>
+                      <td>
+                        {{
+                          attempt.result
+                            ? attempt.result === "pass"
+                              ? "Pass"
+                              : "Fail"
+                            : "N/A"
+                        }}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Payment Information -->
+            <div class="review-section">
+              <h3 class="section-title">
+                <span class="english">Payment Information</span>
+                <span class="japanese">支払い情報</span>
+              </h3>
+              <div class="review-field">
+                <span class="field-label">Amount:</span>
+                <span class="field-value"
+                  >₹{{ registrationFormData.paymentAmount }}</span
+                >
+              </div>
+              <div class="review-field">
+                <span class="field-label">Payment Date:</span>
+                <span class="field-value">{{
+                  registrationFormData.paymentDate | date : "medium"
+                }}</span>
+              </div>
+            </div>
+
+            <!-- Terms Confirmation -->
+            <div class="review-section confirmation">
+              <div class="review-field">
+                <span class="field-label">Terms Accepted:</span>
+                <span class="field-value">{{
+                  registrationFormData.agreeTerms ? "Yes" : "No"
+                }}</span>
+              </div>
+              <div
+                class="review-field"
+                *ngIf="registrationFormData.acceptUnderTakingAndAffidavit"
+              >
+                <span class="field-label">Undertaking Accepted:</span>
+                <span class="field-value"
+                  >Yes ({{
+                    registrationFormData.underTakingAcceptDate
+                      | date : "medium"
+                  }})</span
+                >
+              </div>
+            </div>
+          </div>
+
+          <!-- Document Previews -->
+          <div class="document-previews">
+            <h3 class="section-title">
+              <span class="english">Document Uploads</span>
+              <span class="japanese">アップロードされた文書</span>
+            </h3>
+
+            <div class="preview-grid">
+              <div class="preview-item">
+                <h4>Photograph</h4>
+                <div class="preview-container">
+                  <img
+                    [src]="registrationFormData.uploadedDocuments.photo"
+                    alt="Photograph Preview"
+                    class="preview-image"
+                  />
+                </div>
+              </div>
+
+              <div class="preview-item">
+                <h4>Signature</h4>
+                <div class="preview-container">
+                  <img
+                    [src]="registrationFormData.uploadedDocuments.signature"
+                    alt="Signature Preview"
+                    class="preview-image"
+                  />
+                </div>
+              </div>
+
+              <div class="preview-item">
+                <h4>ID Proof</h4>
+                <div class="preview-container">
+                  <img
+                    [src]="registrationFormData.uploadedDocuments.id_proof"
+                    alt="ID Proof Preview"
+                    class="preview-image"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="review-actions">
+          <button type="button" class="back-button" (click)="previousPhase()">Back to Edit</button>
+          <button
+            type="button"
+            class="submit-button"
+            (click)="submitRegistration()"
+          >
             Submit Registration
           </button>
         </div>

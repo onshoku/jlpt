@@ -1,0 +1,205 @@
+@import 'src/styles.scss';
+
+.profile-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem;
+
+  .profile-header {
+    margin-bottom: 2rem;
+
+    h1 {
+      font-size: 2rem;
+      color: $color-dark;
+      margin-bottom: 0.5rem;
+    }
+
+    .subtitle {
+      color: $color-text-light;
+    }
+  }
+
+  .profile-content {
+    display: grid;
+    grid-template-columns: 250px 1fr;
+    gap: 2rem;
+
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .photo-section {
+    .photo-container {
+      margin-bottom: 1.5rem;
+    }
+
+    .photo-wrapper {
+      position: relative;
+      width: 200px;
+      height: 200px;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid $color-secondary;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+      .profile-photo {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .photo-actions {
+        position: absolute;
+        bottom: 10px;
+        right: 10px;
+        display: flex;
+        gap: 0.5rem;
+      }
+    }
+
+    .photo-specs {
+      h3 {
+        font-size: 1rem;
+        color: $color-dark;
+        margin-bottom: 0.5rem;
+      }
+
+      ul {
+        margin: 0;
+        padding-left: 1.2rem;
+        font-size: 0.85rem;
+        color: $color-text-light;
+
+        li {
+          margin-bottom: 0.3rem;
+        }
+      }
+    }
+  }
+
+  .details-form {
+    .form-section {
+      margin-bottom: 2rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid lighten($color-secondary, 10%);
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      h2 {
+        font-size: 1.3rem;
+        color: $color-dark;
+        margin-bottom: 1.5rem;
+        display: flex;
+        flex-direction: column;
+
+        .japanese {
+          font-size: 0.9rem;
+          color: $color-text-light;
+          margin-top: 0.2rem;
+        }
+      }
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .form-field {
+      margin-bottom: 1rem;
+
+      mat-form-field {
+        width: 100%;
+      }
+    }
+  }
+
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 2rem;
+
+    @media (max-width: 480px) {
+      flex-direction: column-reverse;
+    }
+  }
+}
+
+.form-actions {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 2rem;
+  
+      button {
+        padding: 0.8rem 1.5rem;
+        border-radius: 6px;
+        font-size: 1rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+  
+        &.back-button {
+          background-color: white;
+          border: 1px solid $color-secondary;
+          color: $color-dark;
+  
+          &:hover {
+            background-color: #f5f5f5;
+          }
+        }
+  
+        &.submit-button {
+          background: linear-gradient(to right, #3a4a6b, #2c3a58);
+          color: white;
+          border: none;
+  
+          &:hover:not([disabled]) {
+            background: linear-gradient(to right, #2c3a58, #1e2a3f);
+          }
+  
+          &[disabled] {
+            opacity: 0.6;
+            cursor: not-allowed;
+          }
+        }
+      }
+    }
+
+/* Material overrides */
+.mat-form-field-appearance-outline .mat-form-field-outline {
+  color: #A0D8EF;
+}
+
+.mat-form-field-appearance-outline.mat-focused .mat-form-field-outline-thick {
+  color: #A0D8EF;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .profile-container {
+    padding: 1.5rem;
+
+    .photo-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .profile-container {
+    padding: 1rem;
+
+    .profile-header h1 {
+      font-size: 1.5rem;
+    }
+  }
+}

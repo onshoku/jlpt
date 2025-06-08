@@ -31,7 +31,8 @@ export class LoginComponent {
           this.loading = false;
           this.successMessage = 'Login successful!';
           localStorage.setItem('authToken', result.token);
-          localStorage.setItem('userId',result.data.userId)
+          localStorage.setItem('userId',result.data.userId);
+          localStorage.setItem('name',result.data.fullName)
           if (result.data.role == 'admin')
             this.router.navigateByUrl('/admin/dashboard');
           else this.router.navigateByUrl('/student/dashboard');
