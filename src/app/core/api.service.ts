@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 
 import { Observable } from 'rxjs';
 
-const backendUrl = 'http://localhost:3000/api/';
+const backendUrl = 'http://13.203.168.84:3000/api/';
 @Injectable({
   providedIn: 'root',
 })
