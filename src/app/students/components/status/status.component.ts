@@ -8,7 +8,7 @@ import { BackendService } from 'src/app/core/api.service';
   styleUrls: ['./status.component.scss'],
 })
 export class StatusComponent {
-  currentTerm = 'December 2023 Examination';
+  currentTerm = 'December 2025 Examination';
   registrationSteps = [
     {
       id: 'personal',

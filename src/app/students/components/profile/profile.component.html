@@ -8,7 +8,7 @@
 
   <div class="profile-content">
     <!-- Photo Section -->
-    <div class="photo-section">
+    <!-- <div class="photo-section">
       <div class="photo-container">
         <div class="photo-wrapper">
           <img [src]="profilePhoto || 'assets/default-profile.png'" alt="Profile Photo" class="profile-photo">
@@ -32,7 +32,7 @@
           <li>Clear face visible</li>
         </ul>
       </div>
-    </div>
+    </div> -->
 
     <!-- Personal Details Form -->
     <form [formGroup]="profileForm" (ngSubmit)="onSubmit()" class="details-form">
@@ -78,8 +78,7 @@
               <mat-select formControlName="gender" required>
                 <mat-option value="male">Male</mat-option>
                 <mat-option value="female">Female</mat-option>
-                <mat-option value="other">Other</mat-option>
-                <mat-option value="prefer-not-to-say">Prefer not to say</mat-option>
+                <mat-option value="N/A">N/A</mat-option>
               </mat-select>
               <mat-error *ngIf="profileForm.get('gender')?.hasError('required')">
                 Gender is required
@@ -100,7 +99,7 @@
         </div>
 
         <!-- Native Language -->
-        <div class="form-field">
+        <!-- <div class="form-field">
           <mat-form-field appearance="outline">
             <mat-label>Native Language</mat-label>
             <input matInput formControlName="nativeLanguage" [matAutocomplete]="auto" required>
@@ -113,7 +112,7 @@
               Native language is required
             </mat-error>
           </mat-form-field>
-        </div>
+        </div> -->
       </div>
 
       <!-- Address Section -->
@@ -126,8 +125,8 @@
         <div class="form-field">
           <mat-form-field appearance="outline">
             <mat-label>House/Apartment/Street</mat-label>
-            <input matInput formControlName="addressLine1" required>
-            <mat-error *ngIf="profileForm.get('addressLine1')?.hasError('required')">
+            <input matInput formControlName="address1" required>
+            <mat-error *ngIf="profileForm.get('address1')?.hasError('required')">
               Address line is required
             </mat-error>
           </mat-form-field>
@@ -136,14 +135,14 @@
         <div class="form-row">
           <div class="form-field">
             <mat-form-field appearance="outline">
-              <mat-label>City</mat-label>
-              <input matInput formControlName="city" required>
-              <mat-error *ngIf="profileForm.get('city')?.hasError('required')">
-                City is required
+              <mat-label>City/State</mat-label>
+              <input matInput formControlName="address2" required>
+              <mat-error *ngIf="profileForm.get('address2')?.hasError('required')">
+                City/State is required
               </mat-error>
             </mat-form-field>
           </div>
-          <div class="form-field">
+          <!-- <div class="form-field">
             <mat-form-field appearance="outline">
               <mat-label>State/Province</mat-label>
               <input matInput formControlName="state" required>
@@ -151,7 +150,7 @@
                 State is required
               </mat-error>
             </mat-form-field>
-          </div>
+          </div> -->
         </div>
 
         <div class="form-row">
@@ -167,8 +166,8 @@
           <div class="form-field">
             <mat-form-field appearance="outline">
               <mat-label>Postal/Zip Code</mat-label>
-              <input matInput formControlName="postalCode" required>
-              <mat-error *ngIf="profileForm.get('postalCode')?.hasError('required')">
+              <input matInput formControlName="pincode" required>
+              <mat-error *ngIf="profileForm.get('pincode')?.hasError('required')">
                 Postal code is required
               </mat-error>
             </mat-form-field>
@@ -178,7 +177,7 @@
 
       <div class="form-actions">
         <button type="button" class="back-button" mat-stroked-button color="primary" (click)="resetForm()">Reset</button>
-        <button type="button" class="submit-button" mat-raised-button color="primary" [disabled]="!profileForm.valid || !profileForm.dirty">
+        <button type="button" class="submit-button" mat-raised-button color="primary" [disabled]="!profileForm.valid || !profileForm.dirty" (click)="onSubmit()">
           Save Changes
         </button>
       </div>

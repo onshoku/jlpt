@@ -54,9 +54,10 @@
       <div *ngSwitchCase="'important-notes'" class="phase-important-notes">
         <h2>Important Notes Before Registration</h2>
         <div class="notes-list">
-          <div class="note-item" *ngFor="let note of importantNotes">
+          <div class="note-item" *ngFor="let note of importantNotes;let i = index">
             <span class="note-icon">⚠️</span>
-            <p>{{ note }}</p>
+            <p *ngIf="i != 0">{{ note }}</p>
+            <p *ngIf="i == 0">Before filling up the form please read <a href="https://www.jlpt.jp/reference/pdf/guide_2025.pdf"  target="_blank" rel="noopener noreferrer">Test Guide </a> carefully</p>
           </div>
         </div>
         <h2>Steps to Follow</h2>
@@ -84,9 +85,9 @@
         </p>
 
         <form [formGroup]="registrationForm">
-          <button type="button" class="action-buttons" (click)="saveProgress()">
+          <!-- <button type="button" class="action-buttons" (click)="saveProgress()">
             Save Progress
-          </button>
+          </button> -->
           <!-- Special Arrangements Section -->
           <div class="form-section">
             <h3 class="section-title">
@@ -187,7 +188,7 @@
               </span>
             </div>
 
-            <div class="form-field">
+            <!-- <div class="form-field">
               <label>
                 SEQ
                 <span class="tooltip-icon" [matTooltip]="passcodeTooltip"
@@ -195,7 +196,7 @@
                 >
               </label>
               <input type="text" formControlName="regSeq" maxlength="4" />
-            </div>
+            </div> -->
 
             <div class="form-field">
               <label>
@@ -573,12 +574,8 @@
               <label>
                 <input type="checkbox" formControlName="agreeTerms" required />
                 I agree to &nbsp;
-                <a href="link-to-test-guide" target="_blank">the test guide</a
-                >,&nbsp;
-                <a href="link-to-undertaking" target="_blank"
-                  >the undertaking </a
-                >, and &nbsp;
-                <a href="link-to-affidavit" target="_blank"> the affidavit.</a>
+                <a href="https://www.jlpt.jp/reference/pdf/guide_2025.pdf"  target="_blank" rel="noopener noreferrer">the test guide</a
+                >
                 <span class="tooltip-icon" [matTooltip]="termsTooltip">?</span>
               </label>
               <span
@@ -1389,7 +1386,7 @@
                 <h4>Photograph</h4>
                 <div class="preview-container">
                   <img
-                    [src]="registrationFormData.uploadedDocuments.photo"
+                    [src]="photoPreview"
                     alt="Photograph Preview"
                     class="preview-image"
                   />
@@ -1400,7 +1397,7 @@
                 <h4>Signature</h4>
                 <div class="preview-container">
                   <img
-                    [src]="registrationFormData.uploadedDocuments.signature"
+                    [src]="signaturePreview"
                     alt="Signature Preview"
                     class="preview-image"
                   />
@@ -1411,7 +1408,7 @@
                 <h4>ID Proof</h4>
                 <div class="preview-container">
                   <img
-                    [src]="registrationFormData.uploadedDocuments.id_proof"
+                    [src]="idProofPreview"
                     alt="ID Proof Preview"
                     class="preview-image"
                   />

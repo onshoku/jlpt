@@ -3,7 +3,7 @@
 <div class="dashboard-container" *ngIf="!isLoading">
     <div class="dashboard-header">
       <h1>Welcome Back, {{userName}}!</h1>
-      <p class="japanese-greeting">おかえりなさい!</p>
+      <!-- <p class="japanese-greeting">おかえりなさい!</p> -->
     </div>
   
     <div class="dashboard-grid">
@@ -43,8 +43,17 @@
             </div>
             <span class="progress-percent">{{exam.progress}}% complete</span>
           </div>
+          
         </div>
-        <button class="card-button" routerLink="/student/registration">View All Status</button>
+        <div style="    height: 50%;
+    display: flex
+;
+    align-content: center;
+    justify-content: center;
+    flex-wrap: wrap;" *ngIf="!currentExams || currentExams.length == 0">
+            You have no registrations so far.
+          </div>
+        <button class="card-button" routerLink="/student/registration" *ngIf="currentExams && currentExams.length > 0">View All Status</button>
       </div>
   
       <!-- Quick Actions Card -->
@@ -87,9 +96,9 @@
               <h3>JLPT {{exam.level}}</h3>
               <p>{{exam.location}}</p>
             </div>
-            <div class="exam-actions">
+            <!-- <div class="exam-actions">
               <button class="small-button">View</button>
-            </div>
+            </div> -->
           </div>
           <div class="no-exams" *ngIf="upcomingExams.length === 0">
             <p>No upcoming exams scheduled</p>
@@ -117,7 +126,7 @@
             <p>Watch Japanese shows without subtitles for 15 minutes daily.</p>
           </div>
         </div>
-        <button class="card-button">More Tips</button>
+        <!-- <button class="card-button" href="https://www.jlpt.jp/e/samples/forlearners.html">More Tips</button> -->
       </div>
     </div>
   </div>

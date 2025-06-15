@@ -54,13 +54,13 @@
       <!-- User Profile -->
       <div class="user-controls">
         <div class="user-profile">
-          <span class="user-greeting">こんにちは, {{userName}}</span>
+          <span class="user-greeting">{{userName}}</span>
           <div class="user-avatar" (click)="toggleDropdown()">
             <span class="avatar-icon">👤</span>
             <i class="dropdown-arrow" [class.open]="dropdownOpen">▼</i>
           </div>
           <div class="dropdown-menu" [class.open]="dropdownOpen" [class.mobile-full]="isMobileView">
-            <a routerLink="/profile" class="dropdown-item">
+            <a routerLink="/student/profile" class="dropdown-item">
               <i class="icon icon-settings"></i> Profile Settings
             </a>
             <a href="#" class="dropdown-item" (click)="logout()">

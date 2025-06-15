@@ -7,6 +7,7 @@ import {
   FormGroup,
   Validators,
 } from '@angular/forms';
+import { DomSanitizer } from '@angular/platform-browser';
 import { ActivatedRoute } from '@angular/router';
 import { map, Observable, startWith } from 'rxjs';
 import { BackendService } from 'src/app/core/api.service';
@@ -326,7 +327,8 @@ export class RegistrationFormComponent {
     private fb: FormBuilder,
     private backendService: BackendService,
     private route: ActivatedRoute,
-    private s3UploadService: S3UploadService
+    private s3UploadService: S3UploadService,
+    private sanitizer: DomSanitizer
   ) {
     this.registrationForm = this.createForm();
 
@@ -348,15 +350,15 @@ export class RegistrationFormComponent {
   }
 
   photoFile: File | null = null;
-  photoPreview: string | null = null;
+  photoPreview: any = null;
   photoError: string | null = null;
 
   signatureFile: File | null = null;
-  signaturePreview: string | null = null;
+  signaturePreview: any = null;
   signatureError: string | null = null;
 
   idProofFile: File | null = null;
-  idProofPreview: string | null = null;
+  idProofPreview: any = null;
   idProofError: string | null = null;
 
   // Photo specifications
@@ -511,7 +513,7 @@ export class RegistrationFormComponent {
   }
 
   acceptUndertakingForm() {
-    if (this.agreeTermsUndertaking) {
+    if (this.agreeTermsUndertaking && !this.registrationFormData.acceptUnderTakingAndAffidavit) {
       let changedValues: any = {};
       changedValues['userId'] = localStorage.getItem('userId') || '';
       changedValues['progress'] = 60;
@@ -528,93 +530,101 @@ export class RegistrationFormComponent {
           this.registrationFormId = result.data.id;
           console.log('result', result);
 
-          this.completePhase('payment');
+          this.completePhase('undertaking');
         },
         (error: any) => {
           //console.log('!! error from updateAPI', error);
         }
       );
+    }else{
+      this.completePhase('undertaking');
     }
   }
 
   async uploadPictures(): Promise<void> {
-    if (!this.allDocumentsValid()) {
-      this.invalidUpload = true;
-      return;
-    }
 
-    try {
-      this.invalidUpload = false;
-      let userId = localStorage.getItem('userId') || '';
-      let regId = this.registrationFormId;
-      // Upload photo
-      const photoUrl = await this.s3UploadService.uploadToS3UsingPresignedUrl(
-        this.photoFile!,
-        userId,
-        regId,
-        'photo'
-      );
+    if(this.registrationFormData.uploadedDocuments && this.photoFile && this.signatureFile && this.idProofFile){
+      this.completePhase('upload-documents');
+    }else{
 
-      // Upload signature
-      const signatureUrl =
-        await this.s3UploadService.uploadToS3UsingPresignedUrl(
-          this.signatureFile!,
+      if (!this.allDocumentsValid()) {
+        this.invalidUpload = true;
+        return;
+      }
+  
+      try {
+        this.invalidUpload = false;
+        let userId = localStorage.getItem('userId') || '';
+        let regId = this.registrationFormId;
+        // Upload photo
+        const photoUrl = await this.s3UploadService.uploadToS3UsingPresignedUrl(
+          this.photoFile!,
           userId,
           regId,
-          'signature'
+          'photo'
         );
-
-      // Upload ID proof
-      const idProofUrl = await this.s3UploadService.uploadToS3UsingPresignedUrl(
-        this.idProofFile!,
-        userId,
-        regId,
-        'id_proof'
-      );
-
-      // Now you can save these URLs to your database
-      console.log('Uploaded files:', {
-        photoUrl,
-        signatureUrl,
-        idProofUrl,
-      });
-
-      let changedValues: any = {};
-      changedValues['userId'] = userId;
-      changedValues['progress'] = 40;
-      changedValues['testLevel'] = this.registrationFormData['testLevel'];
-      changedValues['documentSubmissionDate'] = new Date().toISOString();
-      changedValues['uploadedDocuments'] = {
-        photo: photoUrl,
-        signature: signatureUrl,
-        id_proof: idProofUrl,
-      };
-
-      if (this.registrationFormId != '') {
-        changedValues['id'] = this.registrationFormId;
-      }
-
-      this.backendService.save(changedValues).subscribe(
-        (result) => {
-          this.registrationFormId = result.data.id;
-          console.log('result', result);
-
-          this.completePhase('upload-documents');
-        },
-        (error: any) => {
-          //console.log('!! error from updateAPI', error);
+  
+        // Upload signature
+        const signatureUrl =
+          await this.s3UploadService.uploadToS3UsingPresignedUrl(
+            this.signatureFile!,
+            userId,
+            regId,
+            'signature'
+          );
+  
+        // Upload ID proof
+        const idProofUrl = await this.s3UploadService.uploadToS3UsingPresignedUrl(
+          this.idProofFile!,
+          userId,
+          regId,
+          'id_proof'
+        );
+  
+        // Now you can save these URLs to your database
+        console.log('Uploaded files:', {
+          photoUrl,
+          signatureUrl,
+          idProofUrl,
+        });
+  
+        let changedValues: any = {};
+        changedValues['userId'] = userId;
+        changedValues['progress'] = 40;
+        changedValues['testLevel'] = this.registrationFormData['testLevel'];
+        changedValues['documentSubmissionDate'] = new Date().toISOString();
+        changedValues['uploadedDocuments'] = {
+          photo: photoUrl,
+          signature: signatureUrl,
+          id_proof: idProofUrl,
+        };
+  
+        if (this.registrationFormId != '') {
+          changedValues['id'] = this.registrationFormId;
         }
-      );
-
-      // Show success message
-      // this.uploadSuccess.emit({
-      //   photoUrl,
-      //   signatureUrl,
-      //   idProofUrl
-      // });
-    } catch (error) {
-      console.error('Upload failed:', error);
-      // this.uploadError.emit('Failed to upload documents. Please try again.');
+  
+        this.backendService.save(changedValues).subscribe(
+          (result) => {
+            this.registrationFormId = result.data.id;
+            console.log('result', result);
+  
+            this.completePhase('upload-documents');
+          },
+          (error: any) => {
+            //console.log('!! error from updateAPI', error);
+          }
+        );
+  
+        // Show success message
+        // this.uploadSuccess.emit({
+        //   photoUrl,
+        //   signatureUrl,
+        //   idProofUrl
+        // });
+      } catch (error) {
+        console.error('Upload failed:', error);
+        // this.uploadError.emit('Failed to upload documents. Please try again.');
+      }
     }
   }
 
@@ -654,7 +664,7 @@ export class RegistrationFormComponent {
       gender: ['', Validators.required],
       nativeLanguage: ['', Validators.required],
       passcode: ['', [Validators.required, Validators.pattern(/^[0-9]{8}$/)]],
-      regSeq: ['', [Validators.required, Validators.pattern(/^[0-9]{8}$/)]],
+      // regSeq: ['', [Validators.required, Validators.pattern(/^[0-9]{8}$/)]],
       dob: ['', Validators.required],
       address1: ['', Validators.required],
       address2: [''],
@@ -751,7 +761,7 @@ export class RegistrationFormComponent {
     const currentIndex = this.phases.findIndex((p) => p.id === phaseId);
     if (currentIndex < this.phases.length - 1) {
       this.currentPhase = this.phases[currentIndex + 1].id;
-      if (phaseId == 'registration-form') {
+      if (phaseId == 'registration-form' || phaseId == 'important-notes') {
         this.registrationForm = this.createForm();
         this.patchFormValues(this.registrationFormData);
       } else if (phaseId == 'payment') {
@@ -819,6 +829,7 @@ export class RegistrationFormComponent {
         (result) => {
           // this.registrationFormId = result.data.id;
           this.completePhase('review');
+          this.toggleNewRegistartion(false)
         },
         (error: any) => {
           //console.log('!! error from updateAPI', error);
@@ -924,6 +935,7 @@ export class RegistrationFormComponent {
     console.log('Form submitted:', this.registrationForm.value);
     let submitValue = this.registrationForm.value;
     submitValue['userId'] = localStorage.getItem('userId');
+    if(!this.registrationFormData.progress)
     submitValue['progress'] = 20;
     if (this.registrationFormId != '') {
       submitValue['id'] = this.registrationFormId;
@@ -1039,6 +1051,17 @@ export class RegistrationFormComponent {
           } else if (progress >= 40 && progress < 60) {
             this.currentPhase = 'undertaking';
             this.agreeTermsUndertaking = res.data.acceptUnderTakingAndAffidavit;
+
+             if(this.registrationFormData.uploadedDocuments.photo){
+              this.getUploadedDocumentsPhoto(this.registrationFormData.uploadedDocuments.photo);
+            }
+            if(this.registrationFormData.uploadedDocuments.id_proof){
+              this.getUploadedDocumentsIDProof(this.registrationFormData.uploadedDocuments.id_proof);
+            }
+            if(this.registrationFormData.uploadedDocuments.signature){
+              this.getUploadedDocumentsSignature(this.registrationFormData.uploadedDocuments.signature);
+            }
+
             this.completedPhases.push('important-notes');
             this.completedPhases.push('registration-form');
             this.completedPhases.push('upload-documents');
@@ -1049,13 +1072,35 @@ export class RegistrationFormComponent {
               this.registrationForm.value.testLevel ||
               this.registrationFormData.testLevel;
 
+             if(this.registrationFormData.uploadedDocuments.photo){
+              this.getUploadedDocumentsPhoto(this.registrationFormData.uploadedDocuments.photo);
+            }
+            if(this.registrationFormData.uploadedDocuments.id_proof){
+              this.getUploadedDocumentsIDProof(this.registrationFormData.uploadedDocuments.id_proof);
+            }
+            if(this.registrationFormData.uploadedDocuments.signature){
+              this.getUploadedDocumentsSignature(this.registrationFormData.uploadedDocuments.signature);
+            }
             this.paymentAmt = this.levelWisePayment[level];
             this.completedPhases.push('important-notes');
             this.completedPhases.push('registration-form');
             this.completedPhases.push('upload-documents');
             this.completedPhases.push('undertaking');
+            this.constructUnderTakingDetail()
           } else if (progress >= 80 && progress < 100) {
             this.currentPhase = 'review';
+
+             if(this.registrationFormData.uploadedDocuments.photo){
+              this.getUploadedDocumentsPhoto(this.registrationFormData.uploadedDocuments.photo);
+            }
+            if(this.registrationFormData.uploadedDocuments.id_proof){
+              this.getUploadedDocumentsIDProof(this.registrationFormData.uploadedDocuments.id_proof);
+            }
+            if(this.registrationFormData.uploadedDocuments.signature){
+              this.getUploadedDocumentsSignature(this.registrationFormData.uploadedDocuments.signature);
+            }
+            this.constructUnderTakingDetail()
+
             this.completedPhases.push('important-notes');
             this.completedPhases.push('registration-form');
             this.completedPhases.push('upload-documents');
@@ -1068,6 +1113,16 @@ export class RegistrationFormComponent {
             this.completedPhases.push('undertaking');
             this.completedPhases.push('payment');
             this.completedPhases.push('review');
+            this.constructUnderTakingDetail()
+            if(this.registrationFormData.uploadedDocuments.photo){
+              this.getUploadedDocumentsPhoto(this.registrationFormData.uploadedDocuments.photo);
+            }
+            if(this.registrationFormData.uploadedDocuments.id_proof){
+              this.getUploadedDocumentsIDProof(this.registrationFormData.uploadedDocuments.id_proof);
+            }
+            if(this.registrationFormData.uploadedDocuments.signature){
+              this.getUploadedDocumentsSignature(this.registrationFormData.uploadedDocuments.signature);
+            }
           }
 
           if(this.registrationFormData.hasOwnProperty('pid')){
@@ -1099,7 +1154,7 @@ export class RegistrationFormComponent {
       gender: apiData.gender,
       nativeLanguage: apiData.nativeLanguage,
       passcode: apiData.passcode,
-      regSeq: apiData.regSeq,
+      // regSeq: apiData.regSeq,
       dob: apiData.dob,
       address1: apiData.address1,
       address2: apiData.address2,
@@ -1136,13 +1191,13 @@ export class RegistrationFormComponent {
       });
 
     // Patch mediaContacts
-    const mediaContactsArray = this.registrationForm.get(
-      'mediaContacts'
-    ) as FormArray;
-    if (apiData.mediaContacts)
-      apiData.mediaContacts.forEach((contact: any) => {
-        mediaContactsArray.push(this.fb.control(contact));
-      });
+    const mediaContactsArray = this.registrationForm.get('mediaContacts') as FormArray;
+  mediaContactsArray.clear(); // Clear existing values
+  if (apiData.mediaContacts && Array.isArray(apiData.mediaContacts)) {
+    apiData.mediaContacts.forEach((contact: any) => {
+      mediaContactsArray.push(this.fb.control(contact));
+    });
+  }
   }
 
   constructUnderTakingDetail() {
@@ -1235,6 +1290,125 @@ getOccupation(code: number): string {
   ];
   const occupation = this.occupationalDetails.find(o => o.value == code);
   return occupation ? occupation.label : code + '';
+}
+
+getUploadedDocumentsPhoto(url:string){
+  
+  this.s3UploadService.getPresignedURL(this.extractS3KeyFromPresignedUrl(url)).subscribe({
+    next: (res:any) => {
+      console.log(res);
+      let imageUrl = res.imageUrl
+      // this.assignPresignedUrlToFile(imageUrl,'document.jpg')
+      this.s3UploadService.presignedUrlToFile(imageUrl, 'photo')
+      .subscribe((file:any) => {
+        console.log('File created:', file);
+        console.log('File name:', file.name);
+        console.log('File size:', file.size);
+        console.log('File type:', file.type);
+        this.photoFile = file
+        const reader = new FileReader();
+    reader.onload = (e: any) => {
+      // Sanitize the URL for security
+      this.photoPreview = this.sanitizer.bypassSecurityTrustUrl(e.target.result);
+    };
+    reader.readAsDataURL(file);
+        // Now you can use this File object for uploads or other processing
+      }, (error:any) => {
+        console.error('Error converting URL to file:', error);
+      });
+      },
+      error: (err:any) => {},
+    });
+}
+
+getUploadedDocumentsIDProof(url:string){
+  
+  this.s3UploadService.getPresignedURL(this.extractS3KeyFromPresignedUrl(url)).subscribe({
+    next: (res:any) => {
+      console.log(res);
+      let imageUrl = res.imageUrl
+      // this.assignPresignedUrlToFile(imageUrl,'document.jpg')
+      this.s3UploadService.presignedUrlToFile(imageUrl, 'id-proof')
+      .subscribe((file:any) => {
+        console.log('File created:', file);
+        console.log('File name:', file.name);
+        console.log('File size:', file.size);
+        console.log('File type:', file.type);
+        this.idProofFile = file
+        const reader = new FileReader();
+    reader.onload = (e: any) => {
+      // Sanitize the URL for security
+      this.idProofPreview = this.sanitizer.bypassSecurityTrustUrl(e.target.result);
+    };
+    reader.readAsDataURL(file);
+        // Now you can use this File object for uploads or other processing
+      }, (error:any) => {
+        console.error('Error converting URL to file:', error);
+      });
+      },
+      error: (err:any) => {},
+    });
+}
+
+getUploadedDocumentsSignature(url:string){
+  
+  this.s3UploadService.getPresignedURL(this.extractS3KeyFromPresignedUrl(url)).subscribe({
+    next: (res:any) => {
+      console.log(res);
+      let imageUrl = res.imageUrl
+      // this.assignPresignedUrlToFile(imageUrl,'document.jpg')
+      this.s3UploadService.presignedUrlToFile(imageUrl, 'signature')
+      .subscribe((file:any) => {
+        console.log('File created:', file);
+        console.log('File name:', file.name);
+        console.log('File size:', file.size);
+        console.log('File type:', file.type);
+        this.signatureFile = file
+        const reader = new FileReader();
+    reader.onload = (e: any) => {
+      // Sanitize the URL for security
+      this.signaturePreview = this.sanitizer.bypassSecurityTrustUrl(e.target.result);
+    };
+    reader.readAsDataURL(file);
+        // Now you can use this File object for uploads or other processing
+      }, (error:any) => {
+        console.error('Error converting URL to file:', error);
+      });
+      },
+      error: (err:any) => {},
+    });
+}
+ extractS3KeyFromPresignedUrl(url:any) {
+  try {
+    const urlObj = new URL(url);
+    // Split at '?' to remove query parameters and get just the path
+    const pathOnly = urlObj.pathname.substring(1).split('?')[0];
+    return encodeURIComponent(pathOnly);
+  } catch (error) {
+    console.error('Error extracting S3 key:', error);
+    return '';
+  }
+}
+
+async assignPresignedUrlToFile(url: string, fileName: string): Promise<void> {
+  try {
+    // Add a timestamp to bust cache
+    const noCacheUrl = url;
+
+    const response = await fetch(noCacheUrl, {
+      method: 'GET',
+      cache: 'no-store' // prevents using HTTP cache
+    });
+
+    const blob = await response.blob();
+
+    const fileType = blob.type || 'application/octet-stream';
+
+    this.photoFile = new File([blob], fileName, { type: fileType });
+  } catch (error) {
+    console.error('Failed to fetch or convert file from presigned URL:', error);
+    this.photoFile = null;
+  }
 }
 
 getMediaContact(code: number): string {

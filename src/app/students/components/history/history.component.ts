@@ -178,12 +178,16 @@ export class HistoryComponent {
           if (index >= 0) {
             this.examTerms[index]['exams'] = [];
             res.data.forEach((data: any) => {
+              let seatNumber = 'N/A';
+              if(data.timeOfExam && data.regSiteCode && data.regSeq){
+                seatNumber = data.timeOfExam + data.regSiteCode + data.regSeq
+              }
               this.examTerms[index]['exams'].push({
                 level: 'N' + data.testLevel,
                 testCenter:
                   this.regSiteCodes[data.regSiteCode] || 'Pune Test Center',
                 registrationId: data.id,
-                seatNumber: data.timeOfExam + data.regSiteCode + data.regSeq,
+                seatNumber: seatNumber,
                 result: data.examResult,
               });
             });

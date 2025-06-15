@@ -33,9 +33,16 @@ export class LoginComponent {
           localStorage.setItem('authToken', result.token);
           localStorage.setItem('userId',result.data.userId);
           localStorage.setItem('name',result.data.fullName)
-          if (result.data.role == 'admin')
+          if (result.data.role == 'admin'){
+
             this.router.navigateByUrl('/admin/dashboard');
-          else this.router.navigateByUrl('/student/dashboard');
+          }
+          else{
+            console.log("Routing to student");
+            
+            this.router.navigateByUrl('/student/dashboard');
+          } 
+            
 
           // redirect or other logic here
         },

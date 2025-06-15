@@ -36,6 +36,19 @@ export class BackendService {
     }>(backendUrl + 'jlpt/save', data, { headers });
   }
 
+  saveUser(data: any): Observable<any> {
+    // console.log('readv4', data);
+    // const accessToken = localStorage.getItem('accessToken') as string;
+    // const accessToken = this.commonService.getToken().accessToken as string;
+
+    let headers: HttpHeaders = new HttpHeaders();
+    headers = headers.append('Content-Type', 'application/json');
+    // headers = headers.append('token', accessToken);
+    return this.http.post<{
+      message: string;
+    }>(backendUrl + 'jlpt/user/save/', data, { headers });
+  }
+
   getFormsById(id: string): Observable<any> {
     const accessToken = localStorage.getItem('authToken') || '';
     const headers = new HttpHeaders({
@@ -45,6 +58,17 @@ export class BackendService {
     const params = new HttpParams().set('id', id);
 
     return this.http.get<any>(backendUrl + 'jlpt/' + id, { headers, params });
+  }
+
+  getUserById(id: string): Observable<any> {
+    const accessToken = localStorage.getItem('authToken') || '';
+    const headers = new HttpHeaders({
+      'Cache-Control': 'no-store',
+      Pragma: 'no-cache',
+    }).set('token', accessToken);
+    const params = new HttpParams().set('id', id);
+
+    return this.http.get<any>(backendUrl + 'jlpt/user/' + id, { headers, params });
   }
 
   getFormsByUserId(data: any = {}, timeOfExam = '25B'): Observable<any> {

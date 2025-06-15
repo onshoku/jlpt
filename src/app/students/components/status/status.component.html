@@ -1,5 +1,4 @@
 <!-- <app-header-student></app-header-student> -->
-<img src="https://jaltapphotos.s3.ap-south-1.amazonaws.com/documents/3fe5e58d-20b3-4696-829e-743a0024e132/id_proof/6a875542-9af9-4d4a-9243-825ade5359b1.png">
 <div class="status-container" *ngIf="!isLoading">
     <div class="status-header">
       <div>
@@ -10,7 +9,7 @@
 
       <div>
 
-        <button class="register-button" (click)="emitRegistrationEvent()">Start New Registration</button>
+        <button class="register-button" *ngIf="registrations.length != 0" (click)="emitRegistrationEvent()">Start New Registration</button>
       </div>
     </div>
   
@@ -76,12 +75,12 @@
           <button class="view-form" (click)="viewFullForm(registration)">
             View Full Application
           </button>
-          <button class="download-receipt" (click)="downloadReceipt(registration)">
+          <!-- <button class="download-receipt" (click)="downloadReceipt(registration)">
             Upgrade Level
           </button>
           <button class="download-receipt" *ngIf="registration.status === 'Completed'" (click)="downloadReceipt(registration)">
             Download Receipt
-          </button>
+          </button> -->
         </div>
       </div>
   
@@ -89,7 +88,7 @@
         <div class="empty-icon">📭</div>
         <h3>No Current Registrations</h3>
         <p>You haven't registered for any exams in the current term.</p>
-        <button class="register-button" routerLink="/registration">Register Now</button>
+        <button class="register-button" (click)="emitRegistrationEvent()">Register Now</button>
       </div>
     </div>
   

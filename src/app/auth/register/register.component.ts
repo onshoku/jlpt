@@ -41,7 +41,8 @@ export class RegisterComponent {
       fullName: this.fullName,
       email: this.email,
       phoneNumber: this.phoneNumber,
-      password: this.password
+      password: this.password,
+      role:'student'
     };
 
     this.backendService.register(payload).subscribe({
