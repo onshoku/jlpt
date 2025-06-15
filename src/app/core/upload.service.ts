@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable, of, switchMap } from 'rxjs';
-const backendUrl = 'http://localhost:3000/api/';
+const backendUrl = 'http://13.203.168.84:3000/api/';
 @Injectable({
   providedIn: 'root'
 })
@@ -40,7 +40,7 @@ export class S3UploadService {
       return 'download';
     }
   }
-  
+
   getPresignedURL(id: string): Observable<any> {
       const accessToken = localStorage.getItem('authToken') || '';
       const headers = new HttpHeaders({
