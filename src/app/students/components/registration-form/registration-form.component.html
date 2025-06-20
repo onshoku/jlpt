@@ -57,7 +57,7 @@
           <div class="note-item" *ngFor="let note of importantNotes;let i = index">
             <span class="note-icon">⚠️</span>
             <p *ngIf="i != 0">{{ note }}</p>
-            <p *ngIf="i == 0">Before filling up the form please read <a href="https://www.jlpt.jp/reference/pdf/guide_2025.pdf"  target="_blank" rel="noopener noreferrer">Test Guide </a> carefully</p>
+            <p *ngIf="i == 0">Before filling up the form please read <a href="https://drive.google.com/file/d/1fdPgIaxsaZWpGVwfDx_dXnHvC-wmqf8g/view?usp=sharing"  target="_blank" rel="noopener noreferrer">Test Guide </a> carefully</p>
           </div>
         </div>
         <h2>Steps to Follow</h2>
@@ -463,8 +463,9 @@
                 >
                   <label>
                     <input
-                      type="checkbox"
+                      type="checkbox" 
                       [value]="media.value"
+                      [checked]="getMediaContactDetails(media.value)"
                       (change)="onMediaContactChange($event, media.value)"
                     />
                     {{ media.label }}
@@ -496,6 +497,7 @@
                   <div class="checkbox-cell">
                     <input
                       type="checkbox"
+                      [formControl]="getCommunicationControl(person.id, 'speaking')"
                       (change)="
                         onCommunicationChange($event, person.id, 'speaking')
                       "
@@ -504,6 +506,7 @@
                   <div class="checkbox-cell">
                     <input
                       type="checkbox"
+                      [formControl]="getCommunicationControl(person.id, 'listening')"
                       (change)="
                         onCommunicationChange($event, person.id, 'listening')
                       "
@@ -512,6 +515,7 @@
                   <div class="checkbox-cell">
                     <input
                       type="checkbox"
+                      [formControl]="getCommunicationControl(person.id, 'reading')"
                       (change)="
                         onCommunicationChange($event, person.id, 'reading')
                       "
@@ -520,6 +524,7 @@
                   <div class="checkbox-cell">
                     <input
                       type="checkbox"
+                      [formControl]="getCommunicationControl(person.id, 'writing')"
                       (change)="
                         onCommunicationChange($event, person.id, 'writing')
                       "
@@ -574,7 +579,7 @@
               <label>
                 <input type="checkbox" formControlName="agreeTerms" required />
                 I agree to &nbsp;
-                <a href="https://www.jlpt.jp/reference/pdf/guide_2025.pdf"  target="_blank" rel="noopener noreferrer">the test guide</a
+                <a href="https://drive.google.com/file/d/1fdPgIaxsaZWpGVwfDx_dXnHvC-wmqf8g/view?usp=sharing"  target="_blank" rel="noopener noreferrer">the test guide</a
                 >
                 <span class="tooltip-icon" [matTooltip]="termsTooltip">?</span>
               </label>
@@ -588,7 +593,7 @@
           </div>
 
           <div class="form-actions">
-            <button type="button" class="back-button">Back</button>
+            <!-- <button type="button" class="back-button">Back</button> -->
             <!-- <button type="submit" class="submit-button" [disabled]="!registrationForm.valid">
                   Save & Continue
                 </button> -->

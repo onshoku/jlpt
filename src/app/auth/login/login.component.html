@@ -22,7 +22,7 @@
     <div class="login-card">
       <h2>🔐 Login</h2>
       <form (ngSubmit)="login()" #loginForm="ngForm">
-        <div *ngIf="errorMessage" class="alert alert-danger">
+        <div *ngIf="errorMessage" class="error-message">
           {{ errorMessage }}
         </div>
 

@@ -12,8 +12,8 @@
       <div class="fuji-shadow"></div>
       <div class="login-card">
         <h2>🔑 Reset Password</h2>
-        <form>
-          <input type="email" placeholder="✉️ Registered Email Address" />
+        <form (ngSubmit)="forgot()" #loginForm="ngForm">
+          <input type="email" placeholder="✉️ Registered Email Address" name="email" [(ngModel)]="email" />
           <button type="submit">Send Reset Link</button>
           <div class="auth-links">
             <a href="#" class="back-to-login">← Back to Login</a>

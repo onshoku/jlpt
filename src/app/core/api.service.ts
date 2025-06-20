@@ -98,6 +98,19 @@ export class BackendService {
     }>(backendUrl + 'jlpt/submit', data, { headers });
   }
 
+  forgot(data: any): Observable<any> {
+    // console.log('readv4', data);
+    // const accessToken = localStorage.getItem('accessToken') as string;
+    // const accessToken = this.commonService.getToken().accessToken as string;
+
+    let headers: HttpHeaders = new HttpHeaders();
+    headers = headers.append('Content-Type', 'application/json');
+    // headers = headers.append('token', accessToken);
+    return this.http.post<{
+      message: string;
+    }>(backendUrl + 'auth/forgot', data, { headers });
+  }
+
   login(data: any): Observable<any> {
     // console.log('readv4', data);
     // const accessToken = localStorage.getItem('accessToken') as string;

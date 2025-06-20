@@ -1,0 +1,72 @@
+@use '@angular/material' as mat;
+@import 'src/styles.scss';
+
+.reports-container {
+  padding: 2rem;
+  text-align: center;
+
+  h2 {
+    font-size: 1.8rem;
+    margin-bottom: 2rem;
+    color: $color-dark;
+  }
+}
+
+.reports-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
+}
+
+.report-card {
+  background-color: $color-paper;
+  padding: 1.5rem;
+  border-radius: 1rem;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  &:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
+  }
+
+  .card-icon {
+    font-size: 2.2rem;
+    margin-bottom: 0.8rem;
+  }
+
+  .card-title {
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: $color-text-light;
+  }
+
+  button {
+    background-color: $color-accent;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+
+    &:hover {
+      background-color: darken($color-accent, 10%);
+    }
+  }
+}
+.error-msg {
+  color: #c62828;
+  margin-top: 1rem;
+}
+
+.success-msg {
+  color: #2e7d32;
+  margin-top: 1rem;
+}
+
+
+

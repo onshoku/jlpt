@@ -21,7 +21,7 @@ declare var Razorpay: any;
   styleUrls: ['./registration-form.component.scss'],
 })
 export class RegistrationFormComponent {
-  currentTerm = 'December 2023 Examination';
+  currentTerm = 'December 2025 Examination';
   currentPhase = 'important-notes';
   completedPhases: string[] = [];
   newRegistration = false;
@@ -382,11 +382,11 @@ export class RegistrationFormComponent {
   };
 
   levelWisePayment: any = {
-    1: 1770,
-    2: 1770,
-    3: 1416,
-    4: 1298,
-    5: 1180,
+    1: 1888,
+    2: 1888,
+    3: 1534,
+    4: 1534,
+    5: 1416,
   };
 
   onPhotoSelect(event: any): void {
@@ -536,7 +536,7 @@ export class RegistrationFormComponent {
           //console.log('!! error from updateAPI', error);
         }
       );
-    }else{
+    }else if(this.agreeTermsUndertaking && this.registrationFormData.acceptUnderTakingAndAffidavit){
       this.completePhase('undertaking');
     }
   }
@@ -591,7 +591,7 @@ export class RegistrationFormComponent {
         let changedValues: any = {};
         changedValues['userId'] = userId;
         changedValues['progress'] = 40;
-        changedValues['testLevel'] = this.registrationFormData['testLevel'];
+        changedValues['testLevel'] = this.registrationFormData['testLevel'] || this.registrationForm.value.testLevel;
         changedValues['documentSubmissionDate'] = new Date().toISOString();
         changedValues['uploadedDocuments'] = {
           photo: photoUrl,
@@ -687,6 +687,13 @@ export class RegistrationFormComponent {
     return this.registrationForm.get('attempts') as FormArray;
   }
 
+  getMediaContactDetails(value:number){
+    if(this.registrationForm?.value?.mediaContacts.includes(value)){
+      return true;
+    }else{
+      return false;
+    }
+  }
   ngOnInit(): void {
     this.filteredLanguages = this.registrationForm
       .get('nativeLanguage')!
@@ -713,6 +720,12 @@ export class RegistrationFormComponent {
   isPhaseCompleted(phaseId: string): boolean {
     return this.completedPhases.includes(phaseId);
   }
+
+  getCommunicationControl(personId: string, skill: string): FormControl {
+  return (this.registrationForm.get('communication') as FormGroup)
+    .get(personId + '.' + skill) as FormControl;
+}
+
 
   isPhaseAccessible(phaseId: string): boolean {
     let progress = this.registrationFormData.progress || 0;
@@ -761,10 +774,10 @@ export class RegistrationFormComponent {
     const currentIndex = this.phases.findIndex((p) => p.id === phaseId);
     if (currentIndex < this.phases.length - 1) {
       this.currentPhase = this.phases[currentIndex + 1].id;
-      if (phaseId == 'registration-form' || phaseId == 'important-notes') {
+      if (this.currentPhase == 'registration-form' || this.currentPhase == 'important-notes') {
         this.registrationForm = this.createForm();
         this.patchFormValues(this.registrationFormData);
-      } else if (phaseId == 'payment') {
+      } else if (this.currentPhase == 'payment') {
         let level =
           this.registrationForm.value.testLevel ||
           this.registrationFormData.testLevel;
@@ -774,9 +787,9 @@ export class RegistrationFormComponent {
         if(this.registrationFormData.hasOwnProperty('pid')){
           this.paymentDone = true
         }
-      } else if (phaseId == 'upload-documents') {
+      } else if (this.currentPhase == 'upload-documents') {
         this.invalidUpload = false;
-      } else if (phaseId == 'undertaking') {
+      } else if (this.currentPhase == 'undertaking') {
         this.constructUnderTakingDetail();
       }
     }
@@ -786,8 +799,10 @@ export class RegistrationFormComponent {
     const currentIndex = this.phases.findIndex(
       (p) => p.id === this.currentPhase
     );
+    
     if (currentIndex > 0) {
       this.currentPhase = this.phases[currentIndex - 1].id;
+      
       if (this.currentPhase == 'registration-form') {
         this.registrationForm = this.createForm();
         this.patchFormValues(this.registrationFormData);
@@ -945,6 +960,7 @@ export class RegistrationFormComponent {
       (result) => {
         this.registrationFormId = result.data.id;
         this.currentPhase = 'upload-documents';
+        this.completedPhases.push('registration-form')
       },
       (error: any) => {
         //console.log('!! error from updateAPI', error);
@@ -1202,6 +1218,8 @@ export class RegistrationFormComponent {
 
   constructUnderTakingDetail() {
     let name = '';
+    console.log("Constructing Undertaking Details");
+    
     if (this.registrationFormData.firstName) {
       name += this.registrationFormData.firstName;
     }

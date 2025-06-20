@@ -1,1 +1,25 @@
-<p>reports works!</p>
+<app-header-admin></app-header-admin>
+<div class="reports-container">
+  <h2>📊 Report Generation</h2>
+
+  <div class="reports-grid">
+    <div
+      *ngFor="let report of reports"
+      class="report-card"
+      [@fadeInUp]
+      (mouseenter)="hovered = report.id"
+      (mouseleave)="hovered = null"
+    >
+      <div class="card-icon">{{ report.icon }}</div>
+      <div class="card-title">{{ report.title }}</div>
+      <button (click)="downloadReport(report.id)" [disabled]="isLoading">Export Report</button>
+
+        <div *ngIf="isLoading && downloadingID == report.id">🔄 Generating report...</div>
+        <div *ngIf="errorMessage && downloadingID == report.id" class="error-msg">{{ errorMessage }}</div>
+        <div *ngIf="successMessage && downloadingID == report.id" class="success-msg">{{ successMessage }}</div>
+    </div>
+  </div>
+</div>
+
+
+

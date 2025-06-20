@@ -15,7 +15,8 @@
       <h2 *ngIf="otpVerified">✅ Success</h2>
 
       <!-- Alert Messages -->
-      <div *ngIf="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
+      <div *ngIf="errorMessage" class="error-message" [innerHTML]="errorMessage"></div>
+
       <div *ngIf="successMessage" class="alert alert-success">{{ successMessage }}</div>
 
       <!-- Registration Form -->

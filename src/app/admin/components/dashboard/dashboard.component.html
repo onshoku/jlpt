@@ -1,1 +1,138 @@
-<p>dashboard works!</p>
+<app-header-admin></app-header-admin>
+
+<!-- admin-dashboard.component.html -->
+<!-- dashboard-overview.component.html -->
+<!-- <div class="dashboard-overview">
+
+  <div class="stats-grid">
+    <mat-card class="stat-card">
+      <div class="stat-content">
+        <h3>Total Registrations</h3>
+        <p class="stat-value">{{ stats.totalRegistrations | number }}</p>
+      </div>
+      <mat-icon class="stat-icon">how_to_reg</mat-icon>
+    </mat-card>
+
+    <mat-card class="stat-card">
+      <div class="stat-content">
+        <h3>Pending Approvals</h3>
+        <p class="stat-value">{{ stats.pendingApprovals | number }}</p>
+      </div>
+      <mat-icon class="stat-icon">pending_actions</mat-icon>
+    </mat-card>
+
+    <mat-card class="stat-card">
+      <div class="stat-content">
+        <h3>Total Payments</h3>
+        <p class="stat-value">{{ stats.totalPayments | currency:'INR' }}</p>
+      </div>
+      <mat-icon class="stat-icon">payments</mat-icon>
+    </mat-card>
+
+    <mat-card class="stat-card">
+      <div class="stat-content">
+        <h3>Exam Centers</h3>
+        <p class="stat-value">{{ stats.examCenters | number }}</p>
+      </div>
+      <mat-icon class="stat-icon">location_on</mat-icon>
+    </mat-card>
+  </div>
+
+
+  <div class="charts-section">
+    <mat-card class="chart-card">
+      <h3>Registrations by Level</h3>
+      <canvas id="levelChart" #levelChart></canvas>
+    </mat-card>
+
+    <mat-card class="chart-card">
+      <h3>Monthly Registrations</h3>
+      <canvas id="monthlyChart" #monthlyChart></canvas>
+    </mat-card>
+  </div>
+
+  <mat-card class="recent-activity">
+    <h3>Recent Registrations</h3>
+    <table mat-table [dataSource]="recentRegistrations" class="mat-elevation-z8">
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef>Name</th>
+        <td mat-cell *matCellDef="let element">{{element.name}}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="level">
+        <th mat-header-cell *matHeaderCellDef>Level</th>
+        <td mat-cell *matCellDef="let element">N{{element.level}}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="date">
+        <th mat-header-cell *matHeaderCellDef>Date</th>
+        <td mat-cell *matCellDef="let element">{{element.date | date:'shortDate'}}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef>Status</th>
+        <td mat-cell *matCellDef="let element">
+          <span [class]="getStatusClass(element.status)">{{element.status | titlecase}}</span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="action">
+        <th mat-header-cell *matHeaderCellDef>Action</th>
+        <td mat-cell *matCellDef="let element">
+          <button mat-icon-button (click)="viewDetails(element.id)">
+            <mat-icon>visibility</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+  </mat-card>
+</div> -->
+
+<div class="dashboard-container">
+  <h1>🧑‍💼 Admin Dashboard</h1>
+  <p class="subtitle">Overview of JLPT Registrations, Payments & Activities</p>
+
+  <!-- Summary Cards -->
+  <div class="summary-cards">
+    <div class="card" *ngFor="let stat of summaryStats">
+      <h3>{{ stat.label }}</h3>
+      <p>{{ stat.value }}</p>
+    </div>
+  </div>
+
+  <!-- Chart Section -->
+  <div class="charts-section">
+    <div class="chart-card">
+      <h3>📊 Registrations per Level</h3>
+      <canvas baseChart 
+              [datasets]="levelChartData" 
+              [labels]="levelLabels" 
+              
+              [type]="'bar'">
+      </canvas>
+    </div>
+
+    <div class="chart-card">
+      <h3>💰 Payment Status</h3>
+      <canvas baseChart 
+              [datasets]="paymentChartData" 
+              [labels]="['Paid', 'Unpaid']" 
+              
+              [type]="'doughnut'">
+      </canvas>
+    </div>
+
+    <div class="chart-card full-width">
+      <h3>📈 Monthly Registrations</h3>
+      <canvas baseChart 
+              [datasets]="monthlyChartData" 
+              [labels]="monthlyLabels" 
+             
+              [type]="'line'">
+      </canvas>
+    </div>
+  </div>
+</div>
